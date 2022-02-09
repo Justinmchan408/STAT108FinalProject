@@ -1,0 +1,62 @@
+---
+title: "Final Project Proposal"
+author: "Isaac Plotkin and Justin Chan"
+date: "2/8/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Narrative
+## Research Question
+### Background
+One of the hardest things for investments is to decide whether the amount to pay for that investment will have a great return. Often times, people struggle choosing what is the best car for them and if they are paying a fair price for that type of car. However, it can be hard to estimate a fair price for a car due to a number of various features such as car brand, car model, engine type, horsepower, car size and many other features that can be hard to compare car prices depending on different features.
+
+### Motivation
+In this project, we want to make it easier for others to be able to actually determine if they are receiving fair price for the car they are purchasing. Many salesmen try to upsell a car to make more commissions on a car where some may be overpaying for a car when comparing to its market price. To be able to determine people are getting a fair price for a car, we hope to create a linear regression model that can accurate predict car price based on these various car features.
+
+### Hypothesis
+When making the linear regression model, we hypothesize that car brand (carName), type of car body (carBody), and fuel type (fueltype) will be the largest factors when determining a car's price. Furthermore, we believe that a linear regression model will be the ideal model to use to predict car prices.
+
+## Dataset
+### Obervations
+The obervations of the dataset are pretty straight forward where each obervation or row is a car with the columns being various features of the car. The dataset includes 26 columns where one column is an obervation index and another column is car price which is the variable we are trying to predict so we have 24 input or car features for 205 observations/cars that we can use our linear regression model.
+
+### General Description of Variables
+
+The following is the data dictionary of our dataset that gives a clear description of each variable and the type of variable (categorical, continuous/numeric) for each of our possible inputs to use in the linear model from our dataset.
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+car_data_dictionary <- read_csv("~/Desktop/School/STAT108/Final_Project_Dataset/CarDataDictionary.csv")
+car_columns = c("Car_ID", "Unique id of each observation (Interger)")
+car_data_dictionary <- car_data_dictionary[car_columns]
+```
+
+```{r car variables, echo=T}
+print(car_data_dictionary, n = 25)
+```
+
+### Data Collection
+The data was originally collected from various market surveys of different types of cars across the United States market around 1987 to learn how to price cars in China depending on the American market. There is an assumption that the cars in the data set have been randomly chosen from the set of cars in the various market surveys. Link to the dataset: <https://www.kaggle.com/hellbuoy/car-price-prediction>
+
+# The Data
+## Summary
+As mentioned above, the data contains 205 rows or observations that represent a car and 26 columns which are 26 different features of each car including its sales price and index in the dataset.
+
+## Glimpse
+To see a summary of the car dataset, glimpse will be called on the datset to have a better sense of how the data looks in code. 
+```{r car data download, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(broom)
+library(cowplot)
+car_data <- read_csv("~/Desktop/School/STAT108/Final_Project_Dataset/CarPrice_Assignment.csv")
+```
+
+```{r car data show, echo=T}
+glimpse(car_data)
+```
