@@ -1,8 +1,4 @@
-STAT 108: Project Proposal
-
-Dimensions: 205 observations x 26 variables (24 input variables)
-
-<br>Data Dictionary:
+<br>##Data Dictionary:
 
 1:	Car_ID = Unique id of each observation (Interger)	
 
@@ -55,6 +51,8 @@ Dimensions: 205 observations x 26 variables (24 input variables)
 25:	highwaympg = Mileage on highway (Numeric)	
 
 26:	price(Dependent variable) = Price of car (Numeric)
+
+Dimensions: 205 observations x 26 variables (24 input variables)
 
 
 
