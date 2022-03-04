@@ -30,31 +30,94 @@ The following is the data dictionary of our dataset that gives a clear descripti
 
 ```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
-car_data_dictionary <- read_csv("~/Desktop/School/STAT108/Final_Project_Dataset/CarDataDictionary.csv")
-car_columns = c("Car_ID", "Unique id of each observation (Interger)")
-car_data_dictionary <- car_data_dictionary[car_columns]
 ```
 
-```{r car variables, echo=T}
-print(car_data_dictionary, n = 25)
-```
+# ```{r car variables, echo=T}
+# print(car_data_dictionary, n = 25)
+# ```
 
 ### Data Collection
 The data was originally collected from various market surveys of different types of cars across the United States market around 1987 to learn how to price cars in China depending on the American market. There is an assumption that the cars in the data set have been randomly chosen from the set of cars in the various market surveys. Link to the dataset: <https://www.kaggle.com/hellbuoy/car-price-prediction>
 
-# The Data
-## Summary
-As mentioned above, the data contains 205 rows or observations that represent a car and 26 columns which are 26 different features of each car including its sales price and index in the dataset.
-
-## Glimpse
-To see a summary of the car dataset, glimpse will be called on the datset to have a better sense of how the data looks in code. 
 ```{r car data download, echo=FALSE, message=FALSE, warning=FALSE}
 library(knitr)
 library(broom)
 library(cowplot)
-car_data <- read_csv("~/Desktop/School/STAT108/Final_Project_Dataset/CarPrice_Assignment.csv")
+library(patchwork)
+car_data <- read_csv("~/Desktop/School/STAT108/STAT108FinalProject/data/CarPrice_Assignment.csv")
 ```
 
-```{r car data show, echo=T}
-glimpse(car_data)
+
+# Analysis
+## EDA
+```{r price, echo= TRUE}
+ggplot(data = car_data, aes(x = price)) + 
+  geom_histogram() + 
+  labs(x = "Price", 
+       y = "Counts", 
+       title = "Price Distribution")
+
+```
+
+```{r summary statistics, echo= TRUE}
+car_data %>%
+  summarise(min = min(price), 
+            q1 = quantile(price, probs = c(0.25)), 
+            median = median(price), 
+            q3 = quantile(price, probs = c(0.75)), 
+            max = max(price), 
+            iqr = IQR(price), 
+            mean = mean(price), 
+            std_dev = sd(price)
+            )
+
+```
+
+```{r univariate predictor variables, echo= TRUE}
+p1 <- ggplot(data = car_data, aes(x = symboling)) + 
+  geom_bar() + 
+  labs(x = "Symboling", 
+       y = "Counts", 
+       title = "Symboling Distribution")
+
+p2 <- ggplot(data = car_data, aes(x = drivewheel)) + 
+  geom_bar() + 
+  labs(x = "Drive Wheel", 
+       y = "Counts", 
+       title = "Drive Wheel Distribution")
+
+p3 <- ggplot(data = car_data, aes(x = fueltype)) + 
+  geom_bar() + 
+  labs(x = "Fuel Type", 
+       y = "Counts", 
+       title = "Fuel Type Distribution")
+
+p4 <- ggplot(data = car_data, aes(x = aspiration)) + 
+  geom_bar() + 
+  labs(x = "Aspiration", 
+       y = "Counts", 
+       title = "Aspiration Distribution")
+
+p5 <- ggplot(data = car_data, aes(x = doornumber)) + 
+  geom_bar() + 
+  labs(x = "Door Number", 
+       y = "Counts", 
+       title = "Door Number Distribution")
+
+p6 <- ggplot(data = car_data, aes(x = carbody)) + 
+  geom_bar() + 
+  labs(x = "Car Body", 
+       y = "Counts", 
+       title = "Car Body Distribution")
+
+p7 <- ggplot(data = car_data, aes(x = CarName)) + 
+  geom_bar() + 
+  labs(x = "Car Name", 
+       y = "Counts", 
+       title = "Car Name Distribution")
+
+(p1+p2+p3)/(p4+p5+p6)
+p7
+
+
 ```
