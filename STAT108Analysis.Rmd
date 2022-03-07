@@ -403,7 +403,20 @@ summary(car_data)
 
 ```{r best model, echo= TRUE}
 library(MuMIn)
-full.model <- lm(price ~ symboling+CarName+fueltype+aspiration+doornumber+carbody+drivewheel+enginelocation+wheelbase+carlength+carwidth+carheight+curbweight+enginetype+cylindernumber, car_data, na.action = "na.fail")
-# +doornumber+carbody+drivewheel+enginelocation+wheelbase+carlength+carwidth+carheight+curbweight+enginetype+cylindernumber+enginesize+fuelsystem+boreratio+stroke+compressionratio+horsepower+peakrpm+citympg+highwaympg
-dredge(full.model)
+full.model <- lm(price ~ wheelbase+symboling+drivewheel+aspiration+cylindernumber+curbweight+carlength+carwidth+enginesize+horsepower+boreratio+fuelsystem+citympg+highwaympg, car_data, na.action = "na.fail")
+# symboling+CarName+fueltype+aspiration+doornumber+carbody+drivewheel+enginelocation+wheelbase+carlength+carwidth+carheight+curbweight+enginetype+cylindernumber+enginesize+fuelsystem+boreratio+stroke+compressionratio+horsepower+peakrpm+citympg+highwaympg
+dredge(full.model, rank = "AICc")
+dredge(full.model, rank = "BIC")
+# AIC
+# 1 carlength, cylindernumber, drivewheel, enginesize, highwaympg, horsepower
+# 2 carwidth, cylindernumber, drivewheel, enginesize, horsepower
+# 3 cylindernumber, drivewheel, enginesize, horsepower, wheelbase
+# 4 cylindernumber, drivewheel, enginesize, highwaympg, horsepower, wheelbase
+# 5 carlength, cylindernumber, drivewheel, enginesize, horsepower
+# BIC
+# 1 carwidth, drivewheel, enginesize, horsepower
+# 2 carwidth, cylindernumber, drivewheel, enginesize, horsepower
+# 3 cylindernumber, drivewheel, enginesize, horsepower, wheelbase
+# 4 carlength, cylindernumber, drivewheel, enginesize, horsepower
+# 5 boreratio, carwidth, drivewheel, enginesize, horsepower
 ```
