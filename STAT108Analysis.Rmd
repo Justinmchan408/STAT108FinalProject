@@ -45,6 +45,7 @@ library(broom)
 library(cowplot)
 library(patchwork)
 car_data <- read_csv("~/Desktop/School/STAT108/STAT108FinalProject/data/CarPrice_Assignment.csv")
+glimpse(car_data)
 ```
 
 
@@ -59,7 +60,7 @@ ggplot(data = car_data, aes(x = price)) +
 
 ```
 
-```{r summary statistics, echo= TRUE}
+```{r price summary statistics, echo= TRUE}
 car_data %>%
   summarise(min = min(price), 
             q1 = quantile(price, probs = c(0.25)), 
@@ -186,7 +187,7 @@ p19 <- ggplot(data = car_data, aes(x = compressionratio)) +
   geom_histogram() + 
   labs(x = "Compression Ratio", 
        y = "Counts", 
-       title = "Compression Distribution")
+       title = "Compression Ratio Distribution")
 
 p20 <- ggplot(data = car_data, aes(x = horsepower)) + 
   geom_histogram() + 
@@ -217,6 +218,192 @@ p23 <- ggplot(data = car_data, aes(x = highwaympg)) +
 (p15+p17+p18)/(p19+p20+p21)
 (p22+p23)/(p6 + p16)
 p7
+```
+
+```{r bivariate predictor variables, echo= TRUE}
+b1 <- ggplot(data = car_data, aes(x = as.factor(symboling), y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Symboling", 
+       y = "Price", 
+       title = "Price vs Symboling")
+
+b2 <- ggplot(data = car_data, aes(x = drivewheel, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Drive Wheel", 
+       y = "price", 
+       title = "Price vs Drive Wheel")
+
+b3 <- ggplot(data = car_data, aes(x = fueltype, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Fuel Type", 
+       y = "Price", 
+       title = "Price vs Fuel Type")
+
+b4 <- ggplot(data = car_data, aes(x = aspiration, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Aspiration", 
+       y = "Price", 
+       title = "Price vs Aspiration")
+
+b5 <- ggplot(data = car_data, aes(x = doornumber, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Door Number", 
+       y = "Price", 
+       title = "Price vs Door Number")
+
+b6 <- ggplot(data = car_data, aes(x = carbody, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Car Body", 
+       y = "Price", 
+       title = "Price vs Car Body")
+
+b7 <- ggplot(data = car_data, aes(x = CarName, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Car Name", 
+       y = "Price", 
+       title = "Price vs Car Name")
+
+b8 <- ggplot(data = car_data, aes(x = wheelbase, y = price)) + 
+  geom_point() + 
+  labs(x = "Wheelbase", 
+       y = "Price", 
+       title = "Price vs Wheelbase")
+
+b9 <- ggplot(data = car_data, aes(x = carlength, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Price", 
+       title = "Price vs Car Length")
+
+b10 <- ggplot(data = car_data, aes(x = carwidth, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Width", 
+       y = "Price", 
+       title = "Price vs Car Width")
+
+b11 <- ggplot(data = car_data, aes(x = carheight, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Height", 
+       y = "Price", 
+       title = "Price vs Car Height")
+
+b12 <- ggplot(data = car_data, aes(x = curbweight, y = price)) + 
+  geom_point() + 
+  labs(x = "Curb Weight", 
+       y = "Price", 
+       title = "Price vs Curb Weight")
+
+b13 <- ggplot(data = car_data, aes(x = enginetype, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Engine Type", 
+       y = "Price", 
+       title = "Price vs Engine Type")
+
+b14 <- ggplot(data = car_data, aes(x = cylindernumber, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Cylinder Number", 
+       y = "Price", 
+       title = "Price vs Cylinder Number")
+
+b15 <- ggplot(data = car_data, aes(x = enginesize, y = price)) + 
+  geom_point() + 
+  labs(x = "Engine Size", 
+       y = "Price", 
+       title = "Price vs Engine Size")
+
+b16 <- ggplot(data = car_data, aes(x = fuelsystem, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Fuel System", 
+       y = "Price", 
+       title = "Price vs Fuel System")
+
+b17 <- ggplot(data = car_data, aes(x = boreratio, y = price)) + 
+  geom_point() + 
+  labs(x = "Bore Ratio", 
+       y = "Price", 
+       title = "Price vs Bore Ratio")
+
+b18 <- ggplot(data = car_data, aes(x = stroke, y = price)) + 
+  geom_point() + 
+  labs(x = "Stroke", 
+       y = "Price", 
+       title = "Price vs Stroke")
+
+b19 <- ggplot(data = car_data, aes(x = compressionratio, y = price)) + 
+  geom_point() + 
+  labs(x = "Compression Ratio", 
+       y = "Price", 
+       title = "Price vs Compression Ratio")
+
+b20 <- ggplot(data = car_data, aes(x = horsepower, y = price)) + 
+  geom_point() + 
+  labs(x = "Horsepower", 
+       y = "Price", 
+       title = "Price vs Horsepower")
+
+b21 <- ggplot(data = car_data, aes(x = peakrpm, y = price)) + 
+  geom_point() + 
+  labs(x = "Peak RPM", 
+       y = "Price", 
+       title = "Price vs Peak RPM")
+
+b22 <- ggplot(data = car_data, aes(x = citympg, y = price)) + 
+  geom_point() + 
+  labs(x = "City MPG", 
+       y = "Price", 
+       title = "Price vs City MPG")
+
+b23 <- ggplot(data = car_data, aes(x = highwaympg, y = price)) + 
+  geom_point() + 
+  labs(x = "Highway MPG", 
+       y = "Price", 
+       title = "Price vs Highway MPG")
+
+(b1+b2+b3)/(b4+b5+b8) # Wheelbase, symboling, drive wheel, aspiration
+(b9+b10+b11)/(b12+b13+b14) # Cylinder num, curb weight, car length, car width
+(b15+b17+b18)/(b19+b20+b21) # Engine size, horsepower, bore ration
+(b22+b23)/(b6 + b16) # fuel system, city mpg, highway mpg
+b7
+```
+```{r multivariate predictor variables, echo= TRUE}
+
+m1 <- ggplot(data = car_data, aes(x = highwaympg, y = citympg, color = price)) + 
+  geom_point() + 
+  labs(x = "Highway MPG", 
+       y = "City MPG", 
+       title = "City MPG vs Highway MPG")
 
 
+m2 <- ggplot(data = car_data, aes(x = carlength, y = carwidth, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Car Width", 
+       title = "Car Width vs Car Length")
+
+m3 <- ggplot(data = car_data, aes(x = carlength, y = carheight, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Car Height", 
+       title = "Car Height vs Car Length")
+
+m4 <- ggplot(data = car_data, aes(x = carwidth, y = carheight, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Width", 
+       y = "Car Height", 
+       title = "Car Height vs Car Width")
+
+(m1+m2)/(m3+m4)
+```
+
+
+```{r predictor variables summary statistics, echo= TRUE}
+summary(car_data)
+```
+
+
+```{r best model, echo= TRUE}
+library(MuMIn)
+full.model <- lm(price ~ symboling+CarName+fueltype+aspiration+doornumber+carbody+drivewheel+enginelocation+wheelbase+carlength+carwidth+carheight+curbweight+enginetype+cylindernumber, car_data, na.action = "na.fail")
+# +doornumber+carbody+drivewheel+enginelocation+wheelbase+carlength+carwidth+carheight+curbweight+enginetype+cylindernumber+enginesize+fuelsystem+boreratio+stroke+compressionratio+horsepower+peakrpm+citympg+highwaympg
+dredge(full.model)
 ```
