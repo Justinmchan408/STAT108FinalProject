@@ -116,7 +116,106 @@ p7 <- ggplot(data = car_data, aes(x = CarName)) +
        y = "Counts", 
        title = "Car Name Distribution")
 
-(p1+p2+p3)/(p4+p5+p6)
+p8 <- ggplot(data = car_data, aes(x = wheelbase)) + 
+  geom_histogram() + 
+  labs(x = "Wheelbase", 
+       y = "Counts", 
+       title = "Wheelbase Distribution")
+
+p9 <- ggplot(data = car_data, aes(x = carlength)) + 
+  geom_histogram() + 
+  labs(x = "Car Length", 
+       y = "Counts", 
+       title = "Car Length Distribution")
+
+p10 <- ggplot(data = car_data, aes(x = carwidth)) + 
+  geom_histogram() + 
+  labs(x = "Car Width", 
+       y = "Counts", 
+       title = "Car Width Distribution")
+
+p11 <- ggplot(data = car_data, aes(x = carheight)) + 
+  geom_histogram() + 
+  labs(x = "Car Height", 
+       y = "Counts", 
+       title = "Car Height Distribution")
+
+p12 <- ggplot(data = car_data, aes(x = curbweight)) + 
+  geom_histogram() + 
+  labs(x = "Curb Weight", 
+       y = "Counts", 
+       title = "Curb Weight Distribution")
+
+p13 <- ggplot(data = car_data, aes(x = enginetype)) + 
+  geom_bar() + 
+  labs(x = "Engine Type", 
+       y = "Counts", 
+       title = "Engine Type Distribution")
+
+p14 <- ggplot(data = car_data, aes(x = cylindernumber)) + 
+  geom_bar() + 
+  labs(x = "Cylinder Number", 
+       y = "Counts", 
+       title = "Cylinder Number Distribution")
+
+p15 <- ggplot(data = car_data, aes(x = enginesize)) + 
+  geom_histogram() + 
+  labs(x = "Engine Size", 
+       y = "Counts", 
+       title = "Engine Size Distribution")
+
+p16 <- ggplot(data = car_data, aes(x = fuelsystem)) + 
+  geom_bar() + 
+  labs(x = "Fuel System", 
+       y = "Counts", 
+       title = "Fuel System Distribution")
+
+p17 <- ggplot(data = car_data, aes(x = boreratio)) + 
+  geom_histogram() + 
+  labs(x = "Bore Ratio", 
+       y = "Counts", 
+       title = "Bore Ratio Distribution")
+
+p18 <- ggplot(data = car_data, aes(x = stroke)) + 
+  geom_histogram() + 
+  labs(x = "Stroke", 
+       y = "Counts", 
+       title = "Stroke Distribution")
+
+p19 <- ggplot(data = car_data, aes(x = compressionratio)) + 
+  geom_histogram() + 
+  labs(x = "Compression Ratio", 
+       y = "Counts", 
+       title = "Compression Distribution")
+
+p20 <- ggplot(data = car_data, aes(x = horsepower)) + 
+  geom_histogram() + 
+  labs(x = "Horsepower", 
+       y = "Counts", 
+       title = "Horsepower Distribution")
+
+p21 <- ggplot(data = car_data, aes(x = peakrpm)) + 
+  geom_histogram() + 
+  labs(x = "Peak RPM", 
+       y = "Counts", 
+       title = "Peak RPM Distribution")
+
+p22 <- ggplot(data = car_data, aes(x = citympg)) + 
+  geom_histogram() + 
+  labs(x = "City MPG", 
+       y = "Counts", 
+       title = "City MPG Distribution")
+
+p23 <- ggplot(data = car_data, aes(x = highwaympg)) + 
+  geom_histogram() + 
+  labs(x = "Highway MPG", 
+       y = "Counts", 
+       title = "Highway MPG Distribution")
+
+(p1+p2+p3)/(p4+p5+p8)
+(p9+p10+p11)/(p12+p13+p14)
+(p15+p17+p18)/(p19+p20+p21)
+(p22+p23)/(p6 + p16)
 p7
 
 
