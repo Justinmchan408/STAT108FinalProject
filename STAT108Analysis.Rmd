@@ -420,3 +420,79 @@ dredge(full.model, rank = "BIC")
 # 4 carlength, cylindernumber, drivewheel, enginesize, horsepower
 # 5 boreratio, carwidth, drivewheel, enginesize, horsepower
 ```
+
+```{r anova table, echo= TRUE}
+final.model <- lm(price ~ drivewheel+cylindernumber+carwidth+enginesize+horsepower, car_data)
+tidy(final.model, conf.int = TRUE) %>% 
+  kable(format = "markdown", digits = 3)
+```
+
+
+```{r linear assumption, echo= TRUE}
+
+car_aug <- augment(final.model)
+l1 = ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted", y = "Residuals", title = "Residuals vs. Predicted")
+
+l2 = ggplot(data = car_aug, aes(x = drivewheel, y = .resid)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Drive Wheel", y = "Residuals", title = "Residuals vs. Drive Wheel")
+
+l3 = ggplot(data = car_aug, aes(x = cylindernumber, y = .resid)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Cylinder Number", y = "Residuals", title = "Residuals vs. Cylinder Number")
+
+l4 = ggplot(data = car_aug, aes(x = carwidth, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Car Width", y = "Residuals", title = "Residuals vs. Car Width")
+
+l5 = ggplot(data = car_aug, aes(x = enginesize, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Engine Size", y = "Residuals", title = "Residuals vs. Engine Size")
+
+l6 = ggplot(data = car_aug, aes(x = horsepower, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Horsepower", y = "Residuals", title = "Residuals vs. Horsepower")
+
+(l1+l2+l3)/(l4+l5+l6)
+```
+
+
+```{r constant variance, eval=T}
+ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted", y = "Residuals", title = "Residuals vs. Predicted")
+
+```
+
+```{r normal condition, eval=T}
+n1 = ggplot(data = car_aug, aes(x = .resid)) +
+  geom_histogram() +
+  labs(x = "Residuals", title = "Distribution of Residuals")
+
+n2 = ggplot(data = car_aug, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(title = "Normal QQ Plot of Residuals")
+
+n1+n2
+```
+
+
+```{r independence condition, eval=T}
+car_aug <- car_aug %>% 
+  mutate(obs_num = 1:nrow(car_aug))
+ggplot(data = car_aug, aes(x = obs_num, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  labs(x = "Observation Number",
+       y = "Residuals",
+       title = "Residuals vs. Observation Number")
+```
