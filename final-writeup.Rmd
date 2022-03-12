@@ -1,0 +1,656 @@
+---
+title: "Final Report"
+author: "Justin Chan and Isaac Plotkin"
+date: "3/12/2022"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis: Final Project
+## Research Question and Modeling Objective
+The research question we have is how to best predict car prices based on various car features in our car dataset. Therefore, our modeling objective is to create the best possible linear model from our set of features in our car dataset and use this model to make predictions on car prices for new cars.
+
+## Description of Data and Response Variable
+### Data
+The observations of the dataset are cars where each row is a car with the columns being various features of the car. The dataset includes 26 columns. One column is an observation index and another column is car price which is the variable we are trying to predict. We have 24 car features and 205 cars that we can use for our linear regression model.
+
+The data was originally collected from various market surveys of different types of cars across the United States market around 1987 to learn how to price cars in China depending on the American market. There is an assumption that the cars in the dataset have been randomly chosen from the set of cars in the various market surveys. Link to the dataset: <https://www.kaggle.com/hellbuoy/car-price-prediction>.The car dataset from Kaggle and necessary packages are downloaded in the following lines of code.
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(broom)
+library(cowplot)
+library(patchwork)
+library(MuMIn)
+```
+```{r car data download, echo=T}
+car_data <- read_csv("data/CarPrice_Assignment.csv")
+glimpse(car_data)
+```
+
+
+### General Description of Variables
+
+The following is the data dictionary of our dataset that gives a clear, general description of our variables/covariates that can be used in the model.
+- \textbf{symboling}: Its assigned insurance risk rating (Categorical)
+
+- \textbf{carCompany}: Name of car campany (Categorical)
+
+- \textbf{fueltype}: Car fuel type i.e gas or diesel (Categorical)
+
+- \textbf{aspiration}: Aspiration used in a car (Categorical)
+
+- \textbf{doornumber}: Number of doors in a car (Categorical)
+
+- \textbf{carbody}: Body of car (Categorical)
+
+- \textbf{drivewheel}: Type of drive wheel(Categorical)
+
+- \textbf{enginelocation}: Location of car engine (Categorical)
+
+- \textbf{wheelbase}: Wheelbase of car (Numeric)
+
+- \textbf{carlength}: Length of car (Numeric)
+
+- \textbf{carwidth}: Width of car (Numeric)
+
+- \textbf{carheight}: Height of car (Numeric)
+
+- \textbf{curbweight}: The weight of a car withoput occupants or baggage (Numeric)
+
+- \textbf{enginetype}: Type of engine (Categorical)
+
+- \textbf{cylindernumber}: Cylinder placed in car (Categorical)
+
+- \textbf{enginesize}: Size of car (Numeric)
+
+- \textbf{fuelsystem}: Fuel Sytem of car (Categorical)
+
+- \textbf{boreratio}: Boreration of car (Numeric)
+
+- \textbf{stroke}: Stroke or volume inside the engine (Numeric)
+
+- \textbf{compressionratio}: compression ratio of car (Numeric)
+
+- \textbf{horsepower}: Horsepower (Numeric)
+
+- \textbf{peakrpm}: car peak rpm (Numeric)
+
+- \textbf{citympg}: mileage in city (Numeric)
+
+- \textbf{highwaympg}: mileage on highway (Numeric)
+
+- \textbf{price}: price of car (Numeric)
+
+
+
+
+
+### Response Variable: Price
+The response variable, price, is the price of the car in our dataset. In order to be able to predict price, we performed some initial univariate analysis of price to observe its spread in the dataset.
+```{r price, echo= TRUE}
+ggplot(data = car_data, aes(x = price)) + 
+  geom_histogram() + 
+  labs(x = "Price", 
+       y = "Counts", 
+       title = "Price Distribution")
+
+```
+The response variable, price, seems unimodal meaning that there is one peak. It also seems to be skewed to the right where there are many datapoints that have price around 5,000-10,000 but there are a few outliers that have price over than 25,000 dollars. To follow up with our analysis, we also created summary statistics for price to see if the statistics reflected the graph we observed.
+```{r price summary statistics, echo= TRUE}
+car_data %>%
+  summarise(min = min(price), 
+            q1 = quantile(price, probs = c(0.25)), 
+            median = median(price), 
+            q3 = quantile(price, probs = c(0.75)), 
+            max = max(price), 
+            iqr = IQR(price), 
+            mean = mean(price), 
+            std_dev = sd(price)
+            )
+
+```
+
+It seems like our summary statistics further support the graph where the quantiles q1 and q2 are much smaller due to the concentration of points based on the distance of min, q1, and median compared to the distance of median, q3, and max.
+
+## EDA
+### Univariate
+In the following code block, we plotted the 23 covariates/possible predictor variables to do a simple univariate analysis. We used bar graphs for categorical variables and histograms for continuous variables. We formatted the graphs to be able to optimize for space on the pdf and still be able to see the visualization analysis for each variable.
+```{r univariate predictor variables, echo= TRUE}
+p1 <- ggplot(data = car_data, aes(x = symboling)) + 
+  geom_bar() + 
+  labs(x = "Symboling", 
+       y = "Counts", 
+       title = "Symboling Distribution")
+
+p2 <- ggplot(data = car_data, aes(x = drivewheel)) + 
+  geom_bar() + 
+  labs(x = "Drive Wheel", 
+       y = "Counts", 
+       title = "Drive Wheel Distribution")
+
+p3 <- ggplot(data = car_data, aes(x = fueltype)) + 
+  geom_bar() + 
+  labs(x = "Fuel Type", 
+       y = "Counts", 
+       title = "Fuel Type Distribution")
+
+p4 <- ggplot(data = car_data, aes(x = aspiration)) + 
+  geom_bar() + 
+  labs(x = "Aspiration", 
+       y = "Counts", 
+       title = "Aspiration Distribution")
+
+p5 <- ggplot(data = car_data, aes(x = doornumber)) + 
+  geom_bar() + 
+  labs(x = "Door Number", 
+       y = "Counts", 
+       title = "Door Number Distribution")
+
+p6 <- ggplot(data = car_data, aes(x = carbody)) + 
+  geom_bar() + 
+  labs(x = "Car Body", 
+       y = "Counts", 
+       title = "Car Body Distribution")
+
+p7 <- ggplot(data = car_data, aes(x = CarName)) + 
+  geom_bar() + 
+  labs(x = "Car Name", 
+       y = "Counts", 
+       title = "Car Name Distribution")
+
+p8 <- ggplot(data = car_data, aes(x = wheelbase)) + 
+  geom_histogram() + 
+  labs(x = "Wheelbase", 
+       y = "Counts", 
+       title = "Wheelbase Distribution")
+
+p9 <- ggplot(data = car_data, aes(x = carlength)) + 
+  geom_histogram() + 
+  labs(x = "Car Length", 
+       y = "Counts", 
+       title = "Car Length Distribution")
+
+p10 <- ggplot(data = car_data, aes(x = carwidth)) + 
+  geom_histogram() + 
+  labs(x = "Car Width", 
+       y = "Counts", 
+       title = "Car Width Distribution")
+
+p11 <- ggplot(data = car_data, aes(x = carheight)) + 
+  geom_histogram() + 
+  labs(x = "Car Height", 
+       y = "Counts", 
+       title = "Car Height Distribution")
+
+p12 <- ggplot(data = car_data, aes(x = curbweight)) + 
+  geom_histogram() + 
+  labs(x = "Curb Weight", 
+       y = "Counts", 
+       title = "Curb Weight Distribution")
+
+p13 <- ggplot(data = car_data, aes(x = enginetype)) + 
+  geom_bar() + 
+  labs(x = "Engine Type", 
+       y = "Counts", 
+       title = "Engine Type Distribution")
+
+p14 <- ggplot(data = car_data, aes(x = cylindernumber)) + 
+  geom_bar() + 
+  labs(x = "Cylinder Number", 
+       y = "Counts", 
+       title = "Cylinder Number Distribution")
+
+p15 <- ggplot(data = car_data, aes(x = enginesize)) + 
+  geom_histogram() + 
+  labs(x = "Engine Size", 
+       y = "Counts", 
+       title = "Engine Size Distribution")
+
+p16 <- ggplot(data = car_data, aes(x = fuelsystem)) + 
+  geom_bar() + 
+  labs(x = "Fuel System", 
+       y = "Counts", 
+       title = "Fuel System Distribution")
+
+p17 <- ggplot(data = car_data, aes(x = boreratio)) + 
+  geom_histogram() + 
+  labs(x = "Bore Ratio", 
+       y = "Counts", 
+       title = "Bore Ratio Distribution")
+
+p18 <- ggplot(data = car_data, aes(x = stroke)) + 
+  geom_histogram() + 
+  labs(x = "Stroke", 
+       y = "Counts", 
+       title = "Stroke Distribution")
+
+p19 <- ggplot(data = car_data, aes(x = compressionratio)) + 
+  geom_histogram() + 
+  labs(x = "Compression Ratio", 
+       y = "Counts", 
+       title = "Compression Ratio Distribution")
+
+p20 <- ggplot(data = car_data, aes(x = horsepower)) + 
+  geom_histogram() + 
+  labs(x = "Horsepower", 
+       y = "Counts", 
+       title = "Horsepower Distribution")
+
+p21 <- ggplot(data = car_data, aes(x = peakrpm)) + 
+  geom_histogram() + 
+  labs(x = "Peak RPM", 
+       y = "Counts", 
+       title = "Peak RPM Distribution")
+
+p22 <- ggplot(data = car_data, aes(x = citympg)) + 
+  geom_histogram() + 
+  labs(x = "City MPG", 
+       y = "Counts", 
+       title = "City MPG Distribution")
+
+p23 <- ggplot(data = car_data, aes(x = highwaympg)) + 
+  geom_histogram() + 
+  labs(x = "Highway MPG", 
+       y = "Counts", 
+       title = "Highway MPG Distribution")
+
+(p1+p2+p3)/(p4+p5+p8)
+(p9+p10+p11)/(p12+p13+p14)
+(p15+p17+p18)/(p19+p20+p21)
+(p22+p23)/(p6 + p16)
+p7
+```
+From the first six graphs, most of the bar graphs have uneven distribution of observations across all categories. For the histograms, they all seemed to be unimodal, but some seemed a bit skewed to the right with outliers. Moving onto the next six graphs, the two bar graphs seems very skewed where one category in enginetype and cylindernumber have most of the observations. In the histograms, most of the graphs seem either unimodal or bimodal and most of the graphs are skewed to the right. The next six graphs are all histograms where most graphs have smaller peaks. A third of the histograms seem to have peak in the middle. Another third seem to have a peak on the left and are skewed right. The last third have a peak a bit to the right and are a bit skewed to the left. For the next four graphs, the histograms seem to be trimodal where the middle peak is generally the highest and the bar graphs have two categories that have most of the observations. The next last graph has too many categories that have a count of 1 with a few of the categories having a count of 6.
+
+After looking at all the graphs, we wanted to see the summary statistics of the univariate variables so we ran the summary method to see the individual statistics of each of our possible covariates.
+
+```{r predictor variables summary statistics, echo= TRUE}
+summary(car_data)
+```
+
+From these visualizations and statistics, we found the general distributions of each individual covariate which is always good to know before modeling. As we move onto bivariate analysis, we want to see how these distributions change when including price values to plot against them.
+
+## Bivariate 
+For bivariate analysis, we wanted to analyze each covariate vs price to see the relationship between each one. We want to be able to see first if a covariate could be used to distinguish price values for cars and see if there is a linear relationship between the predictor variable and our response variable. The following block of code gives us price vs each individual covariate using box plots and scatterplots for categorical and continuous variables.
+```{r bivariate predictor variables, echo= TRUE}
+b1 <- ggplot(data = car_data, aes(x = as.factor(symboling), y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Symboling", 
+       y = "Price", 
+       title = "Price vs Symboling")
+
+b2 <- ggplot(data = car_data, aes(x = drivewheel, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Drive Wheel", 
+       y = "price", 
+       title = "Price vs Drive Wheel")
+
+b3 <- ggplot(data = car_data, aes(x = fueltype, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Fuel Type", 
+       y = "Price", 
+       title = "Price vs Fuel Type")
+
+b4 <- ggplot(data = car_data, aes(x = aspiration, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Aspiration", 
+       y = "Price", 
+       title = "Price vs Aspiration")
+
+b5 <- ggplot(data = car_data, aes(x = doornumber, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Door Number", 
+       y = "Price", 
+       title = "Price vs Door Number")
+
+b6 <- ggplot(data = car_data, aes(x = carbody, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Car Body", 
+       y = "Price", 
+       title = "Price vs Car Body")
+
+b7 <- ggplot(data = car_data, aes(x = CarName, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Car Name", 
+       y = "Price", 
+       title = "Price vs Car Name")
+
+b8 <- ggplot(data = car_data, aes(x = wheelbase, y = price)) + 
+  geom_point() + 
+  labs(x = "Wheelbase", 
+       y = "Price", 
+       title = "Price vs Wheelbase")
+
+b9 <- ggplot(data = car_data, aes(x = carlength, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Price", 
+       title = "Price vs Car Length")
+
+b10 <- ggplot(data = car_data, aes(x = carwidth, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Width", 
+       y = "Price", 
+       title = "Price vs Car Width")
+
+b11 <- ggplot(data = car_data, aes(x = carheight, y = price)) + 
+  geom_point() + 
+  labs(x = "Car Height", 
+       y = "Price", 
+       title = "Price vs Car Height")
+
+b12 <- ggplot(data = car_data, aes(x = curbweight, y = price)) + 
+  geom_point() + 
+  labs(x = "Curb Weight", 
+       y = "Price", 
+       title = "Price vs Curb Weight")
+
+b13 <- ggplot(data = car_data, aes(x = enginetype, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Engine Type", 
+       y = "Price", 
+       title = "Price vs Engine Type")
+
+b14 <- ggplot(data = car_data, aes(x = cylindernumber, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Cylinder Number", 
+       y = "Price", 
+       title = "Price vs Cylinder Number")
+
+b15 <- ggplot(data = car_data, aes(x = enginesize, y = price)) + 
+  geom_point() + 
+  labs(x = "Engine Size", 
+       y = "Price", 
+       title = "Price vs Engine Size")
+
+b16 <- ggplot(data = car_data, aes(x = fuelsystem, y = price)) + 
+  geom_boxplot() + 
+  labs(x = "Fuel System", 
+       y = "Price", 
+       title = "Price vs Fuel System")
+
+b17 <- ggplot(data = car_data, aes(x = boreratio, y = price)) + 
+  geom_point() + 
+  labs(x = "Bore Ratio", 
+       y = "Price", 
+       title = "Price vs Bore Ratio")
+
+b18 <- ggplot(data = car_data, aes(x = stroke, y = price)) + 
+  geom_point() + 
+  labs(x = "Stroke", 
+       y = "Price", 
+       title = "Price vs Stroke")
+
+b19 <- ggplot(data = car_data, aes(x = compressionratio, y = price)) + 
+  geom_point() + 
+  labs(x = "Compression Ratio", 
+       y = "Price", 
+       title = "Price vs Compression Ratio")
+
+b20 <- ggplot(data = car_data, aes(x = horsepower, y = price)) + 
+  geom_point() + 
+  labs(x = "Horsepower", 
+       y = "Price", 
+       title = "Price vs Horsepower")
+
+b21 <- ggplot(data = car_data, aes(x = peakrpm, y = price)) + 
+  geom_point() + 
+  labs(x = "Peak RPM", 
+       y = "Price", 
+       title = "Price vs Peak RPM")
+
+b22 <- ggplot(data = car_data, aes(x = citympg, y = price)) + 
+  geom_point() + 
+  labs(x = "City MPG", 
+       y = "Price", 
+       title = "Price vs City MPG")
+
+b23 <- ggplot(data = car_data, aes(x = highwaympg, y = price)) + 
+  geom_point() + 
+  labs(x = "Highway MPG", 
+       y = "Price", 
+       title = "Price vs Highway MPG")
+
+(b1+b2+b3)/(b4+b5+b8) # Wheelbase, symboling, drive wheel, aspiration
+(b9+b10+b11)/(b12+b13+b14) # Cylinder num, curb weight, car length, car width
+(b15+b17+b18)/(b19+b20+b21) # Engine size, horsepower, bore ration
+(b22+b23)/(b6 + b16) # fuel system, city mpg, highway mpg
+b7
+```
+
+When choosing initial variables to choose for our linear model, we wanted to find scatterplots that had a clear linear relationship and boxplots where categories had
+different median values and price ranges. From our first six graphs, symboling and drivewheel had categories that had different distributions for price, so they are possible covariates. Aspiration and wheelbase seemed pretty reasonable to be covariates so they were also allowed to continue onto the next stage. Fueltype and doornumber were left out due to the minimal difference between their categories in boxplots. Out of the next six graphs analyzed, carlength, carwidth, and curb weight had the most clear linear relationship from the scatterplots. Car height seemed to have a weak linear relationship and was eliminated. From the boxplots, it seemed like the cylindernumber had each of its field to have their unique distributions for price which allowed it to continue as a possible covariate. Engine type seemed to have much more outliers that caused more overlapping of price ranges across categories so we decided to leave it out of further analysis. For the next six graphs, the scatterplots that looked like they had a linear relationship were enginesize, boreratio, and horsepower. The other three predictor variables, compressionratio, stroke, and peakrpm did not seem to have any linear relationship with price so they were excluded as candidates as covariates. Of the next four graphs presented, citympg and highwaympg have a decreasing linear relationship between price so they are allowed to be included for further analysis. Fuelsystem also seemed that it could be possible to be used as a covariate based on a bit of the spread across the categories. On the other hand, carbody categories had to have quite a bit of overlapping across categories which caused the elimination of further analysis. The last graph, carName, had both make and model of each car which only had a count of one car in each bin which would seem to perform well but, it seemed that there would be a too large spread to be effective to estimate price. Essentially, there were too many categories to be able to predict price so to avoid overfitting carname was excluded from further analysis.
+
+### Multivariate
+Mutlivariate analysis will be used to determine if there was interactions between particular covariates. Specifically the ones we believed that would be used in the model and seemed to be associated with each other. The multivariate analysis we did was against highwaympg and citympg since there were miles per gallon variables and would probably be associated with each other. In addition to these two covariates, it was believed that carlength, carwidth, and curbweight would also have interactions since the bigger the car, generally the bigger the width, length and weight of the car. The following blocks of code plots the covariates in scatterplots against each other since they are continuous variables which price colored, with lighter blue representing high car price and dark blue being low car prices.
+
+```{r multivariate predictor variables, echo= TRUE}
+
+m1 <- ggplot(data = car_data, aes(x = highwaympg, y = citympg, color = price)) + 
+  geom_point() + 
+  labs(x = "Highway MPG", 
+       y = "City MPG", 
+       title = "City MPG vs Highway MPG")
+
+
+m2 <- ggplot(data = car_data, aes(x = carlength, y = carwidth, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Car Width", 
+       title = "Car Width vs Car Length")
+
+m3 <- ggplot(data = car_data, aes(x = carlength, y = curbweight, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Length", 
+       y = "Car Height", 
+       title = "Car Height vs Car Length")
+
+m4 <- ggplot(data = car_data, aes(x = carwidth, y = curbweight, color = price)) + 
+  geom_point() + 
+  labs(x = "Car Width", 
+       y = "Car Height", 
+       title = "Car Height vs Car Width")
+
+(m1+m2)/(m3+m4)
+```
+Due to the clear relationships between citympg and highwaympg, car height and car length, and car height and car width, these interactions may be something to consider when creating the linear model. Car width and car length seemed to have the weakest relationship but, should still be considered when making the model.
+
+## Modeling Approach
+The modeling approach we decided would be best is to use the fourteen covariates that seemed to have a linear relationship between car price from our bivariate analysis for our model. A multivariate linear model will be used because our outcome of car price is continuous so it makes sense to have a linear model to be able to predict car price with multiple covariates. We wanted to use the AIC and BIC of each model to determine our model selection of which variables would be best to be used in the linear model since we do not want to overfit our model. We wanted to search all possible models so we used the method dredge() from the MuMIn package to be able to create all the possible models from our covariartes and order them by AIC and BIC values.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "..."
+  if (length(lines)==1) {        # first n lines
+    if (length(x) > lines) {
+      # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+We wanted to use all the 14 covariates in our dataset that passed our initial bivariate analysis in a grid search using AIC to see which would be the best model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates are made and each combination of the model with the covariates are created and ordered by AIC in ascending order. We selected the top 5 best models and the covariates associated with them.
+```{r best model AIC, echo= TRUE, output.lines=1:12}
+
+full.model <- lm(price ~ wheelbase+symboling+drivewheel+aspiration+cylindernumber+curbweight*carlength*carwidth+enginesize+horsepower+boreratio+fuelsystem+citympg*highwaympg, car_data, na.action = "na.fail")
+dredge(full.model, rank = "AICc")
+
+# AIC
+# 1 carlength, curbweight, citympg, cylindernumber, drivewheel, enginesize, highwaympg, horsepower, carlength:curbweight
+# 2 carlength, curbweight, citympg, cylindernumber, drivewheel, enginesize, highwaympg, horsepower, wheelbase, carlength:curbweight
+# 3 carlength, curbweight, citympg, cylindernumber, drivewheel, enginesize, fuelsystem, highwaympg, horsepower, carlength:curbweight, citympg:highwaympg
+# 4 carlength, curbweight, citympg, cylindernumber, drivewheel, enginesize, fuelsystem, highwaympg, horsepower, wheelbase, carlength:curbweight
+# 5 carlength, curbweight, cylindernumber, drivewheel, enginesize, highwaympg, horsepower, wheelbase, carlength:curbweight
+```
+As we mentioned it above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
+
+```{r best model BIC, echo= TRUE, output.lines=1:12}
+
+dredge(full.model, rank = "BIC")
+# BIC
+# 1 carlength, curbweight, drivewheel, enginesize, horsepower, carlength:curbweight
+# 2 carlength, curbweight, drivewheel, enginesize, horsepower, wheelbase, carlength:curbweight
+# 3 carlength, curbweight, drivewheel, enginesize, horsepower, symboling, carlength:curbweight
+# 4 boreratio, carlength, curbweight, drivewheel, enginesize, horsepower, carlength:curbweight
+# 5 carlength, curbweight, citympg, drivewheel, enginesize, highwaympg, horsepower, carlength:curbweight
+```
+After observing the top 5 multivariate linear models given by AIC and BIC, we looked to see the overlaps between the top models for each to determine the best model that has both a low AIC and BIC. The AIC top 5 models included much more features than the BIC models so, the model selected was the BIC model that most closely resembled the AIC models. That model was number 5 on the BIC model which contained variables such as citympg, drivewheel, enginesize, and horsepower that were prevalent in the AIC models. The model will also include the interaction between car length and curbwight which was in every AIC and BIC model.
+
+## Output of Final Model
+It was decided that number 5 for our BIC model was selected where are ANOVA table is displayed on the coefficients is displayed below of the final model selected.
+
+```{r anova table and model summary, echo= TRUE}
+final.model <- lm(price ~ carlength*curbweight+citympg+drivewheel+enginesize+highwaympg+horsepower, car_data)
+tidy(final.model, conf.int = TRUE) %>% 
+  kable(format = "markdown", digits = 3)
+
+summary(final.model)
+```
+## Assumptions
+There are some assumptions that should be checked when using a multivariable linear model. These following assumptions should be checked:
+
+* Linearity: Response variable has a linear relationship with predictor variables. There should be no pattern in the plots unless in the case for interaction terms.
+  * Residuals vs Predicted Values
+  * Residuals vs Every Predictor Variables
+
+* Constant Variance: The regression is the same for all predictor variables. The height cloud of points should be constant across the x-axis or across all predictor variable values.
+  * Residuals vs Predicted Values
+  
+* Normality: Response variable follows a Normal distribution around its mean for every predictor variable. The histogram should be approximately unimodal and symmetric and the points on the QQ Plot should follow on the diagonal line.
+  * Histogram of Residuals
+  * Normal QQ-Plot of Residuals
+  
+* Independence: All observations are independent. There should not be pattern in residuals across the order of observations.
+  * Residuals vs Observation Number
+
+### Linearity
+
+```{r linear assumption, echo= TRUE}
+car_aug <- augment(final.model)
+l1 = ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted", y = "Residuals", title = "Residuals vs. Predicted")
+
+l2 = ggplot(data = car_aug, aes(x = carlength, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Car Length", y = "Residuals", title = "Residuals vs. Car Length")
+
+l3 = ggplot(data = car_aug, aes(x = citympg, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "City MPG", y = "Residuals", title = "Residuals vs. City MPG")
+
+l4 = ggplot(data = car_aug, aes(x = drivewheel, y = .resid)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Drive Wheel", y = "Residuals", title = "Residuals vs. Drive Wheel")
+
+l5 = ggplot(data = car_aug, aes(x = enginesize, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Engine Size", y = "Residuals", title = "Residuals vs. Engine Size")
+
+l6 = ggplot(data = car_aug, aes(x = horsepower, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Horsepower", y = "Residuals", title = "Residuals vs. Horsepower")
+
+l7 = ggplot(data = car_aug, aes(x = highwaympg, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Highway MPG", y = "Residuals", title = "Residuals vs. Highway MPG")
+
+(l1)
+(l7+l2+l3)/(l4+l5+l6)
+```
+Based on the plots for checking the linearity assumption, it seems that the model does not fulfill the linearity assumption since there is a fan pattern in almost every predictor variable. Residuals tend to either increase or decrease as a predictor variable increases so it would seem the linearity assumption is not fulfilled. This also goes for the residuals versus predicted plots where there is also a fan pattern.
+
+### Constant Variance
+
+```{r constant variance, eval=T}
+ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Predicted", y = "Residuals", title = "Residuals vs. Predicted")
+
+```
+The model does not meet the constant variance assumption since the graph does not follow a constant variance across all predicted variables. The variance of the residuals tend to increase as the predicted variables increase so it has a fanning pattern.
+
+### Normal Condition
+```{r normal condition, eval=T}
+n1 = ggplot(data = car_aug, aes(x = .resid)) +
+  geom_histogram() +
+  labs(x = "Residuals", title = "Distribution of Residuals")
+
+n2 = ggplot(data = car_aug, aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(title = "Normal QQ Plot of Residuals")
+
+n1+n2
+```
+The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Since the histogram of the residual is not Normal and the QQ Plot is not following the diagonal on the tails, therefore the normal condition is not met for the model.
+
+### Independence
+
+```{r independence condition, eval=T}
+car_aug <- car_aug %>% 
+  mutate(obs_num = 1:nrow(car_aug))
+ggplot(data = car_aug, aes(x = obs_num, y = .resid)) +
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Observation Number",
+       y = "Residuals",
+       title = "Residuals vs. Observation Number")
+```
+
+The independence condition is met in our case since across the order of observations, there is constant variance meaning that it probably means that the observations are independent from one another.
+
+## Interpretations of Model Coefficients
+
+The next part in our analysis is going to refer back to the coefficients in our model. We can display those numbers using the following lines of code.
+```{r model coefficients, echo= TRUE}
+tidy(final.model, conf.int = TRUE) %>% 
+  kable(format = "markdown", digits = 3)
+```
+Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a car length of 0, curb weight of 0, citympg of 0, engine size of 0, highwaympg of 0, and four wheel drive which is not realistic at all. The intercept estimate does not tell us anything meaningful relative towards the data model. The coefficient -380.101 for carbody means that the longer the car is by one unit, the price of the car will go down by 380.101 dollars. The coefficient, -29.539 for curb weight means that for every unit the weight goes up by 1, then the car price will generally decrease by 29.54 dollars. For the coefficient -387.043 for citympg means that for every increase in miles per gallon in the city for a car, then the price will generally drop 387.04 dollars. For the coefficients, -1800.40 for fwd in drivewheel and 423.462 for rwd in drivewheel means that relative to the intercept of 4wd then these would be added to the new intercept for observations of fwd and rwd. The coefficient 72.936 for engine size means that the for one unit increase for the enginesize means that there is a general increase of 72.936 in car price. For the coefficient 348.714 for highwaympg generally means that for every increase in mile per gallon a car has on the highway, there would be an increase of an average of 348.72 dollars in car price. For coefficient of horsepower of 54.240, this means that for every increase in horsepower a car has, in general that there is an increase of about 54.24 in car price. 
+
+<!-- ## Additional Work  -->
+
+<!-- ```{r test} -->
+
+<!-- ``` -->
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
