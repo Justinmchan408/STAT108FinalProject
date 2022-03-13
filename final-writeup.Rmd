@@ -38,62 +38,61 @@ glimpse(car_data)
 ### General Description of Variables
 
 The following is the data dictionary of our dataset that gives a clear, general description of our variables/covariates that can be used in the model.
-- \textbf{symboling}: Its assigned insurance risk rating (Categorical)
 
-- \textbf{carCompany}: Name of car campany (Categorical)
+\textbf{symboling}: Its assigned insurance risk rating (Categorical)
 
-- \textbf{fueltype}: Car fuel type i.e gas or diesel (Categorical)
+\textbf{carCompany}: Name of car campany (Categorical)
 
-- \textbf{aspiration}: Aspiration used in a car (Categorical)
+\textbf{fueltype}: Car fuel type i.e gas or diesel (Categorical)
 
-- \textbf{doornumber}: Number of doors in a car (Categorical)
+\textbf{aspiration}: Aspiration used in a car (Categorical)
 
-- \textbf{carbody}: Body of car (Categorical)
+\textbf{doornumber}: Number of doors in a car (Categorical)
 
-- \textbf{drivewheel}: Type of drive wheel(Categorical)
+\textbf{carbody}: Body of car (Categorical)
 
-- \textbf{enginelocation}: Location of car engine (Categorical)
+\textbf{drivewheel}: Type of drive wheel(Categorical)
 
-- \textbf{wheelbase}: Wheelbase of car (Numeric)
+\textbf{enginelocation}: Location of car engine (Categorical)
 
-- \textbf{carlength}: Length of car (Numeric)
+\textbf{wheelbase}: Wheelbase of car (Numeric)
 
-- \textbf{carwidth}: Width of car (Numeric)
+\textbf{carlength}: Length of car (Numeric)
 
-- \textbf{carheight}: Height of car (Numeric)
+\textbf{carwidth}: Width of car (Numeric)
 
-- \textbf{curbweight}: The weight of a car withoput occupants or baggage (Numeric)
+\textbf{carheight}: Height of car (Numeric)
 
-- \textbf{enginetype}: Type of engine (Categorical)
+\textbf{curbweight}: The weight of a car withoput occupants or baggage (Numeric)
 
-- \textbf{cylindernumber}: Cylinder placed in car (Categorical)
+\textbf{enginetype}: Type of engine (Categorical)
 
-- \textbf{enginesize}: Size of car (Numeric)
+\textbf{cylindernumber}: Cylinder placed in car (Categorical)
 
-- \textbf{fuelsystem}: Fuel Sytem of car (Categorical)
+\textbf{enginesize}: Size of car (Numeric)
 
-- \textbf{boreratio}: Boreration of car (Numeric)
+\textbf{fuelsystem}: Fuel Sytem of car (Categorical)
 
-- \textbf{stroke}: Stroke or volume inside the engine (Numeric)
+\textbf{boreratio}: Boreration of car (Numeric)
 
-- \textbf{compressionratio}: compression ratio of car (Numeric)
+\textbf{stroke}: Stroke or volume inside the engine (Numeric)
 
-- \textbf{horsepower}: Horsepower (Numeric)
+\textbf{compressionratio}: compression ratio of car (Numeric)
 
-- \textbf{peakrpm}: car peak rpm (Numeric)
+\textbf{horsepower}: Horsepower (Numeric)
 
-- \textbf{citympg}: mileage in city (Numeric)
+\textbf{peakrpm}: car peak rpm (Numeric)
 
-- \textbf{highwaympg}: mileage on highway (Numeric)
+\textbf{citympg}: mileage in city (Numeric)
 
-- \textbf{price}: price of car (Numeric)
+\textbf{highwaympg}: mileage on highway (Numeric)
 
-
+\textbf{price}: price of car (Numeric)
 
 
 
 ### Response Variable: Price
-The response variable, price, is the price of the car in our dataset. In order to be able to predict price, we performed some initial univariate analysis of price to observe its spread in the dataset.
+The response variable, \textbf{price}, is the price of the car in our dataset. In order to be able to predict price, we performed some initial univariate analysis of price to observe its spread in the dataset.
 ```{r price, echo= TRUE}
 ggplot(data = car_data, aes(x = price)) + 
   geom_histogram() + 
@@ -102,7 +101,8 @@ ggplot(data = car_data, aes(x = price)) +
        title = "Price Distribution")
 
 ```
-The response variable, price, seems unimodal meaning that there is one peak. It also seems to be skewed to the right where there are many datapoints that have price around 5,000-10,000 but there are a few outliers that have price over than 25,000 dollars. To follow up with our analysis, we also created summary statistics for price to see if the statistics reflected the graph we observed.
+
+\textbf{Price} seems unimodal meaning that there is one peak. It also seems to be skewed to the right where there are many datapoints that have \textbf{price} around 5,000-10,000 but there are a few outliers that have \textbf{price} greater than 25,000 dollars. To follow up with our analysis, we also created summary statistics for price to see if the statistics reflected the graph we observed.
 ```{r price summary statistics, echo= TRUE}
 car_data %>%
   summarise(min = min(price), 
@@ -267,7 +267,8 @@ p23 <- ggplot(data = car_data, aes(x = highwaympg)) +
 (p22+p23)/(p6 + p16)
 p7
 ```
-From the first six graphs, most of the bar graphs have uneven distribution of observations across all categories. For the histograms, they all seemed to be unimodal, but some seemed a bit skewed to the right with outliers. Moving onto the next six graphs, the two bar graphs seems very skewed where one category in enginetype and cylindernumber have most of the observations. In the histograms, most of the graphs seem either unimodal or bimodal and most of the graphs are skewed to the right. The next six graphs are all histograms where most graphs have smaller peaks. A third of the histograms seem to have peak in the middle. Another third seem to have a peak on the left and are skewed right. The last third have a peak a bit to the right and are a bit skewed to the left. For the next four graphs, the histograms seem to be trimodal where the middle peak is generally the highest and the bar graphs have two categories that have most of the observations. The next last graph has too many categories that have a count of 1 with a few of the categories having a count of 6.
+
+From the first six graphs, most of the bar graphs have uneven distribution of observations across all categories. For the histograms, they all seemed to be unimodal, but some seemed a bit skewed to the right with outliers. Moving onto the next six graphs, the two bar graphs seems very skewed where one category in enginetype and cylindernumber have most of the observations. For the histograms, most of the them seem either unimodal or bimodal and are mostly skewed to the right. The next six graphs are all histograms where most of them have smaller peaks. A third of the histograms seem to have peak in the middle. Another third seem to have a peak on the left and are skewed right. The last third have a peak a bit to the right and are a little skewed to the left. For the next four graphs, the histograms seem to be trimodal where the middle peak is generally the highest and the bar graphs have two categories that have most of the observations. The next last graph has too many categories that have a count of 1 with a few of the categories having a count of 6.
 
 After looking at all the graphs, we wanted to see the summary statistics of the univariate variables so we ran the summary method to see the individual statistics of each of our possible covariates.
 
@@ -278,7 +279,7 @@ summary(car_data)
 From these visualizations and statistics, we found the general distributions of each individual covariate which is always good to know before modeling. As we move onto bivariate analysis, we want to see how these distributions change when including price values to plot against them.
 
 ## Bivariate 
-For bivariate analysis, we wanted to analyze each covariate vs price to see the relationship between each one. We want to be able to see first if a covariate could be used to distinguish price values for cars and see if there is a linear relationship between the predictor variable and our response variable. The following block of code gives us price vs each individual covariate using box plots and scatterplots for categorical and continuous variables.
+For bivariate analysis, we wanted to analyze each covariate vs \textbf{price} to see the relationship between each one. We want to be able to see first if a covariate could be used to distinguish price values for cars and see if there is a linear relationship between the predictor variable and our response variable. The following block of code gives us price vs each individual covariate using box plots and scatterplots for categorical and continuous variables.
 ```{r bivariate predictor variables, echo= TRUE}
 b1 <- ggplot(data = car_data, aes(x = as.factor(symboling), y = price)) + 
   geom_boxplot() + 
@@ -425,11 +426,10 @@ b23 <- ggplot(data = car_data, aes(x = highwaympg, y = price)) +
 b7
 ```
 
-When choosing initial variables to choose for our linear model, we wanted to find scatterplots that had a clear linear relationship and boxplots where categories had
-different median values and price ranges. From our first six graphs, symboling and drivewheel had categories that had different distributions for price, so they are possible covariates. Aspiration and wheelbase seemed pretty reasonable to be covariates so they were also allowed to continue onto the next stage. Fueltype and doornumber were left out due to the minimal difference between their categories in boxplots. Out of the next six graphs analyzed, carlength, carwidth, and curb weight had the most clear linear relationship from the scatterplots. Car height seemed to have a weak linear relationship and was eliminated. From the boxplots, it seemed like the cylindernumber had each of its field to have their unique distributions for price which allowed it to continue as a possible covariate. Engine type seemed to have much more outliers that caused more overlapping of price ranges across categories so we decided to leave it out of further analysis. For the next six graphs, the scatterplots that looked like they had a linear relationship were enginesize, boreratio, and horsepower. The other three predictor variables, compressionratio, stroke, and peakrpm did not seem to have any linear relationship with price so they were excluded as candidates as covariates. Of the next four graphs presented, citympg and highwaympg have a decreasing linear relationship between price so they are allowed to be included for further analysis. Fuelsystem also seemed that it could be possible to be used as a covariate based on a bit of the spread across the categories. On the other hand, carbody categories had to have quite a bit of overlapping across categories which caused the elimination of further analysis. The last graph, carName, had both make and model of each car which only had a count of one car in each bin which would seem to perform well but, it seemed that there would be a too large spread to be effective to estimate price. Essentially, there were too many categories to be able to predict price so to avoid overfitting carname was excluded from further analysis.
+When choosing initial variables to choose for our linear model, we wanted to find scatterplots that had a clear linear relationship and boxplots where categories had different median values and price ranges. From our first six graphs, \textbf{symboling} and \textbf{drivewheel} had categories that had different distributions for \textbf{price}, so they are possible covariates. \textbf{Aspiration} and \textbf{wheelbase} seemed pretty reasonable to be covariates so they were also allowed to continue onto the next stage. \textbf{Fueltype} and \textbf{doornumber} were left out due to the minimal difference between their categories in the boxplots. Out of the next six graphs analyzed, \textbf{carlength}, \textbf{carwidth}, and \textbf{curbweight} had the most clear linear relationship from the scatterplots. \textbf{Carheight} seemed to have a weak linear relationship and was eliminated. From the boxplots, it seemed like the \textbf{cylindernumber} had each of its field to have their unique distributions for \textbf{price} which allowed it to continue as a possible covariate. \textbf{Enginetype} seemed to have much more outliers that caused more overlapping of price ranges across categories so we decided to leave it out of further analysis. For the next six graphs, the scatterplots that looked like they had a linear relationship were \textbf{enginesize}, \textbf{boreratio}, and \textbf{horsepower}. The other three predictor variables, \textbf{compressionratio}, \textbf{stroke}, and \textbf{peakrpm} did not seem to have any linear relationship with \textbf{price} so they were excluded as covariates. Of the next four graphs presented, \textbf{citympg} and \textbf{highwaympg} have a decreasing linear relationship between \textbf{price} so they are allowed to be included for further analysis. \textbf{Fuelsystem} also seemed that it could be possible to be used as a covariate based on a bit of the spread across the categories. On the other hand, \textbf{carbody} categories have quite a bit of overlapping across categories which caused us to eliminate it from further analysis. The last graph, \textbf{carName}, has both make and model of each car so there is only one car in each bin. Therefore, it seems to be useful, but there is not enough cars per category to accurately estimate price. Essentially, there were too many categories to be able to predict price so in order to avoid overfitting, \textbf{carname} was excluded from further analysis.
 
 ### Multivariate
-Mutlivariate analysis will be used to determine if there was interactions between particular covariates. Specifically the ones we believed that would be used in the model and seemed to be associated with each other. The multivariate analysis we did was against highwaympg and citympg since there were miles per gallon variables and would probably be associated with each other. In addition to these two covariates, it was believed that carlength, carwidth, and curbweight would also have interactions since the bigger the car, generally the bigger the width, length and weight of the car. The following blocks of code plots the covariates in scatterplots against each other since they are continuous variables which price colored, with lighter blue representing high car price and dark blue being low car prices.
+Mutlivariate analysis will be used to determine if there was interactions between particular covariates. Specifically the ones we believed that would be used in the model and seemed to be associated with each other. The multivariate analysis we did was against \textbf{highwaympg} and \textbf{citympg} since there were miles per gallon variables and would probably be associated with each other. In addition to these two covariates, it was believed that \textbf{carlength}, \textbf{carwidth}, and \textbf{curbweight} would also have interactions since the bigger the car, generally the bigger the width, length and weight of the car. The following blocks of code plots the covariates in scatterplots against each other. \textbf{Price} is colored with lighter blue representing high car price and dark blue being low car prices.
 
 ```{r multivariate predictor variables, echo= TRUE}
 
@@ -460,10 +460,11 @@ m4 <- ggplot(data = car_data, aes(x = carwidth, y = curbweight, color = price)) 
 
 (m1+m2)/(m3+m4)
 ```
-Due to the clear relationships between citympg and highwaympg, car height and car length, and car height and car width, these interactions may be something to consider when creating the linear model. Car width and car length seemed to have the weakest relationship but, should still be considered when making the model.
+
+Due to the clear relationships between \textbf{citympg}/\textbf{highwaympg}, \textbf{car height}/\textbf{car length}, and \textbf{car height}/\textbf{car width}, these interactions may be something to consider when creating the linear model. \textbf{Carwidth} and \textbf{carlength} seemed to have the weakest relationship but, should still be considered when making the model.
 
 ## Modeling Approach
-The modeling approach we decided would be best is to use the fourteen covariates that seemed to have a linear relationship between car price from our bivariate analysis for our model. A multivariate linear model will be used because our outcome of car price is continuous so it makes sense to have a linear model to be able to predict car price with multiple covariates. We wanted to use the AIC and BIC of each model to determine our model selection of which variables would be best to be used in the linear model since we do not want to overfit our model. We wanted to search all possible models so we used the method dredge() from the MuMIn package to be able to create all the possible models from our covariartes and order them by AIC and BIC values.
+The modeling approach we decided on was to select from the fourteen covariates that seemed to have a linear relationship with \textbf{price} from our bivariate analysis for our model. A multiple linear regression model will be used because the outcome of car price is continuous and there are several covariates that have a linear relationship with \textbf{price}. We wanted to find the AIC and BIC for each combination of covariates to determine which selection of covariates would be best to use in our linear model. This helps us to prevent our model from overfitting. We wanted to search all possible models so we used the method dredge() from the MuMIn package to be able to create all the possible models from our covariates and order them by AIC and BIC values.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(knitr)
@@ -489,7 +490,7 @@ knit_hooks$set(output = function(x, options) {
 })
 ```
 
-We wanted to use all the 14 covariates in our dataset that passed our initial bivariate analysis in a grid search using AIC to see which would be the best model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates are made and each combination of the model with the covariates are created and ordered by AIC in ascending order. We selected the top 5 best models and the covariates associated with them.
+We want to choose the covariates for our model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates is made. Then the model is tested with every possible combination of covariates and are ordered by AIC in ascending order. We selected the top 5 best models and recorded the covariates associated with them.
 ```{r best model AIC, echo= TRUE, output.lines=1:12}
 
 full.model <- lm(price ~ wheelbase+symboling+drivewheel+aspiration+cylindernumber+curbweight*carlength*carwidth+enginesize+horsepower+boreratio+fuelsystem+citympg*highwaympg, car_data, na.action = "na.fail")
@@ -502,7 +503,8 @@ dredge(full.model, rank = "AICc")
 # 4 carlength, curbweight, citympg, cylindernumber, drivewheel, enginesize, fuelsystem, highwaympg, horsepower, wheelbase, carlength:curbweight
 # 5 carlength, curbweight, cylindernumber, drivewheel, enginesize, highwaympg, horsepower, wheelbase, carlength:curbweight
 ```
-As we mentioned it above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
+
+As we mentioned above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
 
 ```{r best model BIC, echo= TRUE, output.lines=1:12}
 
@@ -514,18 +516,21 @@ dredge(full.model, rank = "BIC")
 # 4 boreratio, carlength, curbweight, drivewheel, enginesize, horsepower, carlength:curbweight
 # 5 carlength, curbweight, citympg, drivewheel, enginesize, highwaympg, horsepower, carlength:curbweight
 ```
-After observing the top 5 multivariate linear models given by AIC and BIC, we looked to see the overlaps between the top models for each to determine the best model that has both a low AIC and BIC. The AIC top 5 models included much more features than the BIC models so, the model selected was the BIC model that most closely resembled the AIC models. That model was number 5 on the BIC model which contained variables such as citympg, drivewheel, enginesize, and horsepower that were prevalent in the AIC models. The model will also include the interaction between car length and curbwight which was in every AIC and BIC model.
+
+After observing the top 5 multivariate linear models given by AIC and BIC, we looked to see the overlaps between the top models for each to determine the best model that has both a low AIC and BIC. The AIC top 5 models included much more features than the BIC models which is why we decided to select the BIC model that most closely resembled the AIC models. That model was number 5 on the BIC model which contained variables \textbf{carlength}, \textbf{curbweight}, \textbf{citympg}, \textbf{drivewheel}, \textbf{enginesize}, \textbf{highwaympg}, \textbf{horsepower}
+\textbf{citympg}, \textbf{drivewheel}, \textbf{enginesize}, and \textbf{horsepower}. The model also includes the interaction between \textbf{carlength} and \textbf{curbweight} which was present in every AIC and BIC model.
 
 ## Output of Final Model
-It was decided that number 5 for our BIC model was selected where are ANOVA table is displayed on the coefficients is displayed below of the final model selected.
+We created the final model Using the covariates we selected after evaluating AIC and BIC values of the model. The table below displays the coefficients for the final model. 
 
 ```{r anova table and model summary, echo= TRUE}
 final.model <- lm(price ~ carlength*curbweight+citympg+drivewheel+enginesize+highwaympg+horsepower, car_data)
 tidy(final.model, conf.int = TRUE) %>% 
   kable(format = "markdown", digits = 3)
 
-summary(final.model)
+# summary(final.model)
 ```
+
 ## Assumptions
 There are some assumptions that should be checked when using a multivariable linear model. These following assumptions should be checked:
 
@@ -585,6 +590,7 @@ l7 = ggplot(data = car_aug, aes(x = highwaympg, y = .resid)) +
 (l1)
 (l7+l2+l3)/(l4+l5+l6)
 ```
+
 Based on the plots for checking the linearity assumption, it seems that the model does not fulfill the linearity assumption since there is a fan pattern in almost every predictor variable. Residuals tend to either increase or decrease as a predictor variable increases so it would seem the linearity assumption is not fulfilled. This also goes for the residuals versus predicted plots where there is also a fan pattern.
 
 ### Constant Variance
@@ -611,7 +617,7 @@ n2 = ggplot(data = car_aug, aes(sample = .resid)) +
 
 n1+n2
 ```
-The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Since the histogram of the residual is not Normal and the QQ Plot is not following the diagonal on the tails, therefore the normal condition is not met for the model.
+The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Since the histogram of the residual is not normal and the QQ Plot is not following the diagonal on the tails, therefore the normal condition is not met for the model.
 
 ### Independence
 
@@ -626,31 +632,20 @@ ggplot(data = car_aug, aes(x = obs_num, y = .resid)) +
        title = "Residuals vs. Observation Number")
 ```
 
-The independence condition is met in our case since across the order of observations, there is constant variance meaning that it probably means that the observations are independent from one another.
+The independence condition is met in our case since across the order of observations, there is constant variance. This means that the observations are most likely independent from one another.
 
 ## Interpretations of Model Coefficients
 
-The next part in our analysis is going to refer back to the coefficients in our model. We can display those numbers using the following lines of code.
+The next part in our analysis is going to refer back to the coefficients in our model. Here is the table of coefficients.
+
 ```{r model coefficients, echo= TRUE}
 tidy(final.model, conf.int = TRUE) %>% 
   kable(format = "markdown", digits = 3)
 ```
+
+$y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{3} + \beta_{4}X_{4} + \beta_{5}X_{5} + \beta_{6}X_{6} + \beta_{7}X_{7} + \beta_{8}X_{8} + \beta_{9}X_{9} + \varepsilon$
+
 Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a car length of 0, curb weight of 0, citympg of 0, engine size of 0, highwaympg of 0, and four wheel drive which is not realistic at all. The intercept estimate does not tell us anything meaningful relative towards the data model. The coefficient -380.101 for carbody means that the longer the car is by one unit, the price of the car will go down by 380.101 dollars. The coefficient, -29.539 for curb weight means that for every unit the weight goes up by 1, then the car price will generally decrease by 29.54 dollars. For the coefficient -387.043 for citympg means that for every increase in miles per gallon in the city for a car, then the price will generally drop 387.04 dollars. For the coefficients, -1800.40 for fwd in drivewheel and 423.462 for rwd in drivewheel means that relative to the intercept of 4wd then these would be added to the new intercept for observations of fwd and rwd. The coefficient 72.936 for engine size means that the for one unit increase for the enginesize means that there is a general increase of 72.936 in car price. For the coefficient 348.714 for highwaympg generally means that for every increase in mile per gallon a car has on the highway, there would be an increase of an average of 348.72 dollars in car price. For coefficient of horsepower of 54.240, this means that for every increase in horsepower a car has, in general that there is an increase of about 54.24 in car price. 
 
 <!-- ## Additional Work  -->
 
-<!-- ```{r test} -->
-
-<!-- ``` -->
-
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
