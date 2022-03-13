@@ -30,9 +30,8 @@ library(patchwork)
 library(MuMIn)
 library(rms)
 ```
-```{r car data download, echo=T}
+```{r car data download, echo=FALSE, message=FALSE, warning=FALSE}
 car_data <- read_csv("data/CarPrice_Assignment.csv")
-glimpse(car_data)
 ```
 
 
@@ -94,7 +93,7 @@ The following is the data dictionary of our dataset that gives a clear, general 
 
 ### Response Variable: Price
 The response variable, \textbf{price}, is the price of the car in our dataset. In order to be able to predict price, we performed some initial univariate analysis of price to observe its spread in the dataset.
-```{r price, echo= TRUE}
+```{r price, echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(data = car_data, aes(x = price)) + 
   geom_histogram() + 
   labs(x = "Price", 
@@ -104,7 +103,7 @@ ggplot(data = car_data, aes(x = price)) +
 ```
 
 \textbf{Price} seems unimodal meaning that there is one peak. It also seems to be skewed to the right where there are many datapoints that have \textbf{price} around 5,000-10,000 but there are a few outliers that have \textbf{price} greater than 25,000 dollars. To follow up with our analysis, we also created summary statistics for price to see if the statistics reflected the graph we observed.
-```{r price summary statistics, echo= TRUE}
+```{r price summary statistics, echo=FALSE, message=FALSE, warning=FALSE}
 car_data %>%
   summarise(min = min(price), 
             q1 = quantile(price, probs = c(0.25)), 
@@ -123,7 +122,7 @@ It seems like our summary statistics further support the graph where the quantil
 ## EDA
 ### Univariate
 In the following code block, we plotted the 23 covariates/possible predictor variables to do a simple univariate analysis. We used bar graphs for categorical variables and histograms for continuous variables. We formatted the graphs to be able to optimize for space on the pdf and still be able to see the visualization analysis for each variable.
-```{r univariate predictor variables, echo= TRUE}
+```{r univariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
 p1 <- ggplot(data = car_data, aes(x = symboling)) + 
   geom_bar() + 
   labs(x = "Symboling", 
@@ -272,7 +271,7 @@ From the first six graphs, most of the bar graphs have uneven distribution of ob
 
 After looking at all the graphs, we wanted to see the summary statistics of the univariate variables so we ran the summary method to see the individual statistics of each of our possible covariates.
 
-```{r predictor variables summary statistics, echo= TRUE}
+```{r predictor variables summary statistics, echo=FALSE, message=FALSE, warning=FALSE}
 summary(car_data)
 ```
 
@@ -280,7 +279,7 @@ From these visualizations and statistics, we found the general distributions of 
 
 ## Bivariate 
 For bivariate analysis, we wanted to analyze each covariate vs \textbf{price} to see the relationship between each one. We want to be able to see first if a covariate could be used to distinguish price values for cars and see if there is a linear relationship between the predictor variable and our response variable. The following block of code gives us price vs each individual covariate using box plots and scatterplots for categorical and continuous variables.
-```{r bivariate predictor variables, echo= TRUE}
+```{r bivariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
 b1 <- ggplot(data = car_data, aes(x = as.factor(symboling), y = price)) + 
   geom_boxplot() + 
   labs(x = "Symboling", 
@@ -430,7 +429,7 @@ When choosing initial variables to choose for our linear model, we wanted to fin
 ### Multivariate
 Mutlivariate analysis will be used to determine if there was interactions between particular covariates. Specifically the ones we believed that would be used in the model and seemed to be associated with each other. The multivariate analysis we did was against \textbf{highwaympg} and \textbf{citympg} since there were miles per gallon variables and would probably be associated with each other. In addition to these two covariates, it was believed that \textbf{carlength}, \textbf{carwidth}, and \textbf{curbweight} would also have interactions since the bigger the car, generally the bigger the width, length and weight of the car. The following blocks of code plots the covariates in scatterplots against each other. \textbf{Price} is colored with lighter blue representing high car price and dark blue being low car prices.
 
-```{r multivariate predictor variables, echo= TRUE}
+```{r multivariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
 
 m1 <- ggplot(data = car_data, aes(x = highwaympg, y = citympg, color = price)) + 
   geom_point() + 
@@ -491,7 +490,7 @@ knit_hooks$set(output = function(x, options) {
 
 ### AIC
 We want to choose the covariates for our model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates is made. Then the model is tested with every possible combination of covariates and are ordered by AIC in ascending order. We selected the top 5 best models and recorded the covariates associated with them.
-```{r best model AIC, echo= TRUE, output.lines=1:12}
+```{r best model AIC, echo=FALSE, message=FALSE, warning=FALSE, output.lines=1:12}
 
 full.model <- lm(price ~ wheelbase+symboling+drivewheel+aspiration+cylindernumber+curbweight*carlength*carwidth+enginesize+horsepower+boreratio+fuelsystem+citympg*highwaympg, car_data, na.action = "na.fail")
 dredge(full.model, rank = "AICc")
@@ -507,7 +506,7 @@ dredge(full.model, rank = "AICc")
 ### BIC
 As we mentioned above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
 
-```{r best model BIC, echo = TRUE, output.lines=1:12}
+```{r best model BIC, echo=FALSE, message=FALSE, warning=FALSE, output.lines=1:12}
 
 dredge(full.model, rank = "BIC")
 # BIC
@@ -524,33 +523,27 @@ After observing the top 5 multivariate linear models given by AIC and BIC, we lo
 ### VIF
 
 Next we ran VIF on the model to check for multicollinearity. \textbf{carlength} had a VIF of 28.32 and \textbf{curbweight} had a VIF of 253.92 which are both > 10. We decided to remove curbweight because it has a much larger VIF than carlength.
-```{r, echo = FALSE}
+```{r VIF, echo=FALSE, message=FALSE, warning=FALSE}
 final.model <- lm(price ~ carlength*curbweight+citympg+drivewheel+enginesize+highwaympg+horsepower, car_data)
 
-tidy(vif(final.model))
+kable(vif(final.model))
 ```
 
-```{r}
-final.model <- lm(price ~ citympg*highwaympg+carlength++drivewheel+enginesize+horsepower, car_data)
 
-tidy(vif(final.model))
-```
+```{r final model after VIF, echo=FALSE, message=FALSE, warning=FALSE}
+final.model <- lm(price ~ highwaympg+carlength+drivewheel+enginesize+horsepower, car_data)
 
-```{r}
-final.model <- lm(price ~ highwaympg+carlength++drivewheel+enginesize+horsepower, car_data)
-
-tidy(vif(final.model))
+kable(vif(final.model))
 ```
 
 ## Output of Final Model
 We created the final model Using the covariates we selected after evaluating AIC and BIC values of the model. The table below displays the coefficients for the final model. 
 
-```{r anova table and model summary, echo= TRUE}
-final.model <- lm(price ~ carlength*curbweight+citympg+drivewheel+enginesize+highwaympg+horsepower, car_data)
+```{r anova table and model summary, echo=FALSE, message=FALSE, warning=FALSE}
+final.model <- lm(price ~ highwaympg+carlength+drivewheel+enginesize+horsepower, car_data)
 tidy(final.model, conf.int = TRUE) %>% 
   kable(format = "markdown", digits = 3)
 
-# summary(final.model)
 ```
 
 ## Assumptions
@@ -572,7 +565,7 @@ There are some assumptions that should be checked when using a multivariable lin
 
 ### Linearity
 
-```{r linear assumption, echo= TRUE}
+```{r linear assumption, echo=FALSE, message=FALSE, warning=FALSE}
 car_aug <- augment(final.model)
 l1 = ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.3) +
@@ -584,40 +577,35 @@ l2 = ggplot(data = car_aug, aes(x = carlength, y = .resid)) +
   geom_hline(yintercept = 0, color = "red") +
   labs(x = "Car Length", y = "Residuals", title = "Residuals vs. Car Length")
 
-l3 = ggplot(data = car_aug, aes(x = citympg, y = .resid)) +
-  geom_point(alpha = 0.3) +
-  geom_hline(yintercept = 0, color = "red") +
-  labs(x = "City MPG", y = "Residuals", title = "Residuals vs. City MPG")
-
-l4 = ggplot(data = car_aug, aes(x = drivewheel, y = .resid)) +
+l3 = ggplot(data = car_aug, aes(x = drivewheel, y = .resid)) +
   geom_boxplot() +
   geom_hline(yintercept = 0, color = "red") +
   labs(x = "Drive Wheel", y = "Residuals", title = "Residuals vs. Drive Wheel")
 
-l5 = ggplot(data = car_aug, aes(x = enginesize, y = .resid)) +
+l4 = ggplot(data = car_aug, aes(x = enginesize, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "red") +
   labs(x = "Engine Size", y = "Residuals", title = "Residuals vs. Engine Size")
 
-l6 = ggplot(data = car_aug, aes(x = horsepower, y = .resid)) +
+l5 = ggplot(data = car_aug, aes(x = horsepower, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "red") +
   labs(x = "Horsepower", y = "Residuals", title = "Residuals vs. Horsepower")
 
-l7 = ggplot(data = car_aug, aes(x = highwaympg, y = .resid)) +
+l6 = ggplot(data = car_aug, aes(x = highwaympg, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "red") +
   labs(x = "Highway MPG", y = "Residuals", title = "Residuals vs. Highway MPG")
 
 (l1)
-(l7+l2+l3)/(l4+l5+l6)
+(l2+l3)/(l4+l5+l6)
 ```
 
 Based on the plots for checking the linearity assumption, it seems that the model does not fulfill the linearity assumption since there is a fan pattern in almost every predictor variable. Residuals tend to either increase or decrease as a predictor variable increases so it would seem the linearity assumption is not fulfilled. This also goes for the residuals versus predicted plots where there is also a fan pattern.
 
 ### Constant Variance
 
-```{r constant variance, eval=T}
+```{r constant variance, echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.3) +
   geom_hline(yintercept = 0, color = "red") +
@@ -627,7 +615,7 @@ ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
 The model does not meet the constant variance assumption since the graph does not follow a constant variance across all predicted variables. The variance of the residuals tend to increase as the predicted variables increase so it has a fanning pattern.
 
 ### Normal Condition
-```{r normal condition, eval=T}
+```{r normal condition, echo=FALSE, message=FALSE, warning=FALSE}
 n1 = ggplot(data = car_aug, aes(x = .resid)) +
   geom_histogram() +
   labs(x = "Residuals", title = "Distribution of Residuals")
@@ -643,7 +631,7 @@ The normal condition is not met since the QQ Plot is not following a completely 
 
 ### Independence
 
-```{r independence condition, eval=T}
+```{r independence condition, echo=FALSE, message=FALSE, warning=FALSE}
 car_aug <- car_aug %>% 
   mutate(obs_num = 1:nrow(car_aug))
 ggplot(data = car_aug, aes(x = obs_num, y = .resid)) +
@@ -660,7 +648,7 @@ The independence condition is met in our case since across the order of observat
 
 The next part in our analysis is going to refer back to the coefficients in our model. Here is the table of coefficients.
 
-```{r model coefficients, echo= TRUE}
+```{r model coefficients, echo=FALSE, message=FALSE, warning=FALSE}
 tidy(final.model, conf.int = TRUE) %>% 
   kable(format = "markdown", digits = 3)
 ```
@@ -669,12 +657,15 @@ $y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{3} + \beta_{4}X_{
 
 $y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{3} + \beta_{4}X_{4} + \beta_{5}X_{5} + \beta_{6}X_{6} + \beta_{7}X_{7} + \beta_{8}X_{8} + \beta_{9}X_{9} + \varepsilon$
 
-Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a car length of 0, curb weight of 0, citympg of 0, engine size of 0, highwaympg of 0, and four wheel drive which is not realistic at all. The intercept estimate does not tell us anything meaningful relative towards the data model. The coefficient -380.101 for carbody means that the longer the car is by one unit, the price of the car will go down by 380.101 dollars. The coefficient, -29.539 for curb weight means that for every unit the weight goes up by 1, then the car price will generally decrease by 29.54 dollars. For the coefficient -387.043 for citympg means that for every increase in miles per gallon in the city for a car, then the price will generally drop 387.04 dollars. For the coefficients, -1800.40 for fwd in drivewheel and 423.462 for rwd in drivewheel means that relative to the intercept of 4wd then these would be added to the new intercept for observations of fwd and rwd. The coefficient 72.936 for engine size means that the for one unit increase for the enginesize means that there is a general increase of 72.936 in car price. For the coefficient 348.714 for highwaympg generally means that for every increase in mile per gallon a car has on the highway, there would be an increase of an average of 348.72 dollars in car price. For coefficient of horsepower of 54.240, this means that for every increase in horsepower a car has, in general that there is an increase of about 54.24 in car price. 
+Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a car length of 0, engine size of 0, highwaympg of 0, horsepower of 0, and four wheel drive which is not realistic at all. The intercept estimate, -20177.318 does not tell us anything meaningful relative towards the data model. For the coefficients, -1262.343 for fwd in drivewheel and 1258.834 for rwd in drivewheel means that relative to the intercept of 4wd then these would be added to the new intercept for observations of fwd and rwd. The coefficient 98.617 for engine size means that the for one unit increase for the enginesize means that there is a general increase of 98.62 in car price. For the coefficient 35.703 for highwaympg generally means that for every increase in mile per gallon a car has on the highway, there would be an increase of an average of 35.70 dollars in car price. For coefficient of horsepower of 51.937, this means that for every increase in horsepower a car has, in general that there is an increase of about 51.94 in car price. The coefficient 84.491 for car length means that the for one unit increase for the carlength means that there is a general increase of 84.49 in car price.
+
+## Limitations
+There are a few limitations of the model that should be acknowledged when it comes to terms of car price prediction. To begin with, the univariate analysis shows some limits the range of data used to train the model for price prediction. For example, the multivariate linear regression model trains on the variable, car length which ranged from 140 to 200 units in our dataset so it would not be wise to use a car with a car length outside the range we trained the model with. In addition to car length, both engine size and horsepower had ranges from 0-200 and highway mpg 20-50 where the model would not be performing optimally.
 
 ## Additional Work
 
 Univariate and bivariate plots for \textbf{carname}.
-```{r}
+```{r add work, echo=FALSE, message=FALSE, warning=FALSE}
 p7+b7
 ```
 
