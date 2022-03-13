@@ -28,6 +28,7 @@ library(broom)
 library(cowplot)
 library(patchwork)
 library(MuMIn)
+library(rms)
 ```
 ```{r car data download, echo=T}
 car_data <- read_csv("data/CarPrice_Assignment.csv")
@@ -265,7 +266,6 @@ p23 <- ggplot(data = car_data, aes(x = highwaympg)) +
 (p9+p10+p11)/(p12+p13+p14)
 (p15+p17+p18)/(p19+p20+p21)
 (p22+p23)/(p6 + p16)
-p7
 ```
 
 From the first six graphs, most of the bar graphs have uneven distribution of observations across all categories. For the histograms, they all seemed to be unimodal, but some seemed a bit skewed to the right with outliers. Moving onto the next six graphs, the two bar graphs seems very skewed where one category in enginetype and cylindernumber have most of the observations. For the histograms, most of the them seem either unimodal or bimodal and are mostly skewed to the right. The next six graphs are all histograms where most of them have smaller peaks. A third of the histograms seem to have peak in the middle. Another third seem to have a peak on the left and are skewed right. The last third have a peak a bit to the right and are a little skewed to the left. For the next four graphs, the histograms seem to be trimodal where the middle peak is generally the highest and the bar graphs have two categories that have most of the observations. The next last graph has too many categories that have a count of 1 with a few of the categories having a count of 6.
@@ -423,7 +423,6 @@ b23 <- ggplot(data = car_data, aes(x = highwaympg, y = price)) +
 (b9+b10+b11)/(b12+b13+b14) # Cylinder num, curb weight, car length, car width
 (b15+b17+b18)/(b19+b20+b21) # Engine size, horsepower, bore ration
 (b22+b23)/(b6 + b16) # fuel system, city mpg, highway mpg
-b7
 ```
 
 When choosing initial variables to choose for our linear model, we wanted to find scatterplots that had a clear linear relationship and boxplots where categories had different median values and price ranges. From our first six graphs, \textbf{symboling} and \textbf{drivewheel} had categories that had different distributions for \textbf{price}, so they are possible covariates. \textbf{Aspiration} and \textbf{wheelbase} seemed pretty reasonable to be covariates so they were also allowed to continue onto the next stage. \textbf{Fueltype} and \textbf{doornumber} were left out due to the minimal difference between their categories in the boxplots. Out of the next six graphs analyzed, \textbf{carlength}, \textbf{carwidth}, and \textbf{curbweight} had the most clear linear relationship from the scatterplots. \textbf{Carheight} seemed to have a weak linear relationship and was eliminated. From the boxplots, it seemed like the \textbf{cylindernumber} had each of its field to have their unique distributions for \textbf{price} which allowed it to continue as a possible covariate. \textbf{Enginetype} seemed to have much more outliers that caused more overlapping of price ranges across categories so we decided to leave it out of further analysis. For the next six graphs, the scatterplots that looked like they had a linear relationship were \textbf{enginesize}, \textbf{boreratio}, and \textbf{horsepower}. The other three predictor variables, \textbf{compressionratio}, \textbf{stroke}, and \textbf{peakrpm} did not seem to have any linear relationship with \textbf{price} so they were excluded as covariates. Of the next four graphs presented, \textbf{citympg} and \textbf{highwaympg} have a decreasing linear relationship between \textbf{price} so they are allowed to be included for further analysis. \textbf{Fuelsystem} also seemed that it could be possible to be used as a covariate based on a bit of the spread across the categories. On the other hand, \textbf{carbody} categories have quite a bit of overlapping across categories which caused us to eliminate it from further analysis. The last graph, \textbf{carName}, has both make and model of each car so there is only one car in each bin. Therefore, it seems to be useful, but there is not enough cars per category to accurately estimate price. Essentially, there were too many categories to be able to predict price so in order to avoid overfitting, \textbf{carname} was excluded from further analysis.
@@ -490,6 +489,7 @@ knit_hooks$set(output = function(x, options) {
 })
 ```
 
+### AIC
 We want to choose the covariates for our model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates is made. Then the model is tested with every possible combination of covariates and are ordered by AIC in ascending order. We selected the top 5 best models and recorded the covariates associated with them.
 ```{r best model AIC, echo= TRUE, output.lines=1:12}
 
@@ -504,9 +504,10 @@ dredge(full.model, rank = "AICc")
 # 5 carlength, curbweight, cylindernumber, drivewheel, enginesize, highwaympg, horsepower, wheelbase, carlength:curbweight
 ```
 
+### BIC
 As we mentioned above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
 
-```{r best model BIC, echo= TRUE, output.lines=1:12}
+```{r best model BIC, echo = TRUE, output.lines=1:12}
 
 dredge(full.model, rank = "BIC")
 # BIC
@@ -519,6 +520,27 @@ dredge(full.model, rank = "BIC")
 
 After observing the top 5 multivariate linear models given by AIC and BIC, we looked to see the overlaps between the top models for each to determine the best model that has both a low AIC and BIC. The AIC top 5 models included much more features than the BIC models which is why we decided to select the BIC model that most closely resembled the AIC models. That model was number 5 on the BIC model which contained variables \textbf{carlength}, \textbf{curbweight}, \textbf{citympg}, \textbf{drivewheel}, \textbf{enginesize}, \textbf{highwaympg}, \textbf{horsepower}
 \textbf{citympg}, \textbf{drivewheel}, \textbf{enginesize}, and \textbf{horsepower}. The model also includes the interaction between \textbf{carlength} and \textbf{curbweight} which was present in every AIC and BIC model.
+
+### VIF
+
+Next we ran VIF on the model to check for multicollinearity. \textbf{carlength} had a VIF of 28.32 and \textbf{curbweight} had a VIF of 253.92 which are both > 10. We decided to remove curbweight because it has a much larger VIF than carlength.
+```{r, echo = FALSE}
+final.model <- lm(price ~ carlength*curbweight+citympg+drivewheel+enginesize+highwaympg+horsepower, car_data)
+
+tidy(vif(final.model))
+```
+
+```{r}
+final.model <- lm(price ~ citympg*highwaympg+carlength++drivewheel+enginesize+horsepower, car_data)
+
+tidy(vif(final.model))
+```
+
+```{r}
+final.model <- lm(price ~ highwaympg+carlength++drivewheel+enginesize+horsepower, car_data)
+
+tidy(vif(final.model))
+```
 
 ## Output of Final Model
 We created the final model Using the covariates we selected after evaluating AIC and BIC values of the model. The table below displays the coefficients for the final model. 
@@ -645,7 +667,15 @@ tidy(final.model, conf.int = TRUE) %>%
 
 $y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{3} + \beta_{4}X_{4} + \beta_{5}X_{5} + \beta_{6}X_{6} + \beta_{7}X_{7} + \beta_{8}X_{8} + \beta_{9}X_{9} + \varepsilon$
 
+$y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{3} + \beta_{4}X_{4} + \beta_{5}X_{5} + \beta_{6}X_{6} + \beta_{7}X_{7} + \beta_{8}X_{8} + \beta_{9}X_{9} + \varepsilon$
+
 Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a car length of 0, curb weight of 0, citympg of 0, engine size of 0, highwaympg of 0, and four wheel drive which is not realistic at all. The intercept estimate does not tell us anything meaningful relative towards the data model. The coefficient -380.101 for carbody means that the longer the car is by one unit, the price of the car will go down by 380.101 dollars. The coefficient, -29.539 for curb weight means that for every unit the weight goes up by 1, then the car price will generally decrease by 29.54 dollars. For the coefficient -387.043 for citympg means that for every increase in miles per gallon in the city for a car, then the price will generally drop 387.04 dollars. For the coefficients, -1800.40 for fwd in drivewheel and 423.462 for rwd in drivewheel means that relative to the intercept of 4wd then these would be added to the new intercept for observations of fwd and rwd. The coefficient 72.936 for engine size means that the for one unit increase for the enginesize means that there is a general increase of 72.936 in car price. For the coefficient 348.714 for highwaympg generally means that for every increase in mile per gallon a car has on the highway, there would be an increase of an average of 348.72 dollars in car price. For coefficient of horsepower of 54.240, this means that for every increase in horsepower a car has, in general that there is an increase of about 54.24 in car price. 
 
-<!-- ## Additional Work  -->
+## Additional Work
+
+Univariate and bivariate plots for \textbf{carname}.
+```{r}
+p7+b7
+```
+
 
