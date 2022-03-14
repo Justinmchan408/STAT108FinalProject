@@ -13,11 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Analysis: Final Project
+
 ## Research Question and Modeling Objective
+
 The research question we have is how to best predict car prices using the various car features from our dataset. Therefore, our modeling objective is to create the best possible linear model using the most optimal set of features in our car dataset. Then we will be able to use this model to make predictions on car prices for new cars. We used \href{https://www.ijrte.org/wp-content/uploads/papers/v8i5s/E10100285S20.pdf}{\emph{Predicting True Value of Used Car using Multiple Linear Regression Model}} (D’Costa et al) and \href{https://www.temjournal.com/content/81/TEMJournalFebruary2019_113_118.pdf}{\emph{Car Prediction using Machine Learning Techniques}} (Gegic et al) as references for this paper.
 
 ## Description of Data and Response Variable
+
 ### Data
+
 The observations (rows) in the dataset are cars with the columns being various features of the car. The dataset includes 205 rows and 26 columns. The first column is an observation index and the last column is \textbf{carprice} which is the response variable we are trying to predict. The rest of the columns are the 24 car features. There are 205 cars that we can use for our linear regression model.
 
 The data was originally collected from various market surveys of different types of cars across the United States market around 1987 to learn how to price cars in China depending on the American market. There is an assumption that the cars in the dataset have been randomly chosen from the set of cars in the various market surveys. 
@@ -95,6 +99,7 @@ The following is the data dictionary of our dataset that gives a clear, general 
 
 
 ### Response Variable: Price
+
 The response variable, \textbf{price}, is the price of the car in our dataset. In order to be able to predict \textbf{price}, we performed some initial univariate analysis of \textbf{price} to observe its spread in the dataset.
 
 ```{r price, echo=FALSE, message=FALSE, warning=FALSE}
@@ -127,6 +132,7 @@ Our summary statistics further support the plot of \textbf{price} distribution. 
 ## EDA
 ### Univariate
 In the following code block, we plotted the 23 covariates/possible predictor variables to do a simple univariate analysis. We used bar graphs for categorical variables and histograms for continuous variables. We formatted the graphs to be able to optimize for space on the pdf and still be able to see the visualization analysis for each variable.
+
 ```{r univariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
 p1 <- ggplot(data = car_data, aes(x = symboling)) + 
   geom_bar() + 
@@ -496,6 +502,7 @@ knit_hooks$set(output = function(x, options) {
 
 ### AIC
 We want to choose the covariates for our model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates is made. Then the model is tested with every possible combination of covariates and are ordered by AIC in ascending order. We selected the top 5 best models and recorded the covariates associated with them.
+
 ```{r best model AIC, echo=FALSE, message=FALSE, warning=FALSE, output.lines=1:12}
 
 full.model <- lm(price ~ wheelbase+symboling+drivewheel+aspiration+cylindernumber+curbweight*carlength*carwidth+enginesize+horsepower+boreratio+fuelsystem+citympg*highwaympg, car_data, na.action = "na.fail")
@@ -622,6 +629,7 @@ ggplot(data = car_aug, aes(x = .fitted, y = .resid)) +
 The model does not meet the constant variance assumption since the graph does not follow a constant variance across all predicted variables. The variance of the residuals tend to increase as the predicted variables increase so it has a fanning pattern.
 
 ### Normal Condition
+
 ```{r normal condition, echo=FALSE, message=FALSE, warning=FALSE}
 n1 = ggplot(data = car_aug, aes(x = .resid)) +
   geom_histogram() +
@@ -634,6 +642,7 @@ n2 = ggplot(data = car_aug, aes(sample = .resid)) +
 
 n1+n2
 ```
+
 The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Since the histogram of the residual is not normal and the QQ Plot is not following the diagonal on the tails, therefore the normal condition is not met for the model.
 
 ### Independence
@@ -667,6 +676,7 @@ $y = -20177.318 + 35.703X_{1} + 84.491X_{2} - 1262.343X_{3} + 1258.834X_{4} + 98
 Based on the table of the linear model above, the estimate intercept is telling us the price of a car with a \textbf{carlength} of 0, \textbf{enginesize} of 0, \textbf{highwaympg} of 0, \textbf{horsepower} of 0, and \textbf{4wd} which is not realistic at all. The intercept estimate, -20177.318 does not tell us anything meaningful relative towards the data model. For the coefficients, if a car's \textbf{drivewheel} is \textbf{fwd} then the price prediction does down \$1262.34 and if a its \textbf{drivewheel} is \textbf{rwd} then the price prediction does up \$1262.34. The coefficient estimate 98.617 for engine size means that the for one unit increase in the \textbf{enginesize} there is a general increase of \$98.62 in car price. The coefficient estimate 35.703 for \textbf{highwaympg} means that for every one unit increase \textbf{highwaympg}, the car price will increase by about \$35.70. The coefficient estimate for \textbf{horsepower} is 51.937 which means that for every one unit increase in \textbf{horsepower}, there is an increase of about \$51.94 in car price. The coefficient estimate 84.491 for \textbf{carlength} means that for one unit increase in \textbf{carlength}, there is a general increase of \$84.49 in car price.
 
 ## Limitations
+
 There are a few limitations of the model that should be acknowledged when trying to predict car price. To begin with, the model will not be able to accurately predict the price of a car that has covariate values outside the range of values that the model was trained on. For example, the final model was trained on the variable \textbf{carlength} which ranged from 140 to 200. Thus it would not be wise to predict the price of car with a \textbf{carlength} outside the range [140,200]. In other words, the model can interpolate but not extrapolate. Another limitation is that this model can only fit data linearly. Even though this dataset fits a linear model well, there might be non linear models that can predict \textbf{price} at a much higher accuracy. 
 
 ## Additional Work
