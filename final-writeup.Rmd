@@ -12,8 +12,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Analysis: Final Project
-
 ## Research Question and Modeling Objective
 
 The research question we have is how to best predict car prices using the various car features from our dataset. Therefore, our modeling objective is to create the best possible linear model using the most optimal set of features in our car dataset. Then we will be able to use this model to make predictions on car prices for new cars. We used \href{https://www.ijrte.org/wp-content/uploads/papers/v8i5s/E10100285S20.pdf}{\emph{Predicting True Value of Used Car using Multiple Linear Regression Model}} (D’Costa et al) and \href{https://www.temjournal.com/content/81/TEMJournalFebruary2019_113_118.pdf}{\emph{Car Prediction using Machine Learning Techniques}} (Gegic et al) as references for this paper.
@@ -130,7 +128,9 @@ car_data %>%
 Our summary statistics further support the plot of \textbf{price} distribution. Since the mean (\$13,276) is much larger than the median (\$10,295) and $q1 - min$ (\$2,670) is much less than $max - q3$ (\$28,897), this proves that the distribution is right skewed and that there are outliers with high \textbf{price}.
 
 ## EDA
+
 ### Univariate
+
 In the following code block, we plotted the 23 covariates/possible predictor variables to do a simple univariate analysis. We used bar graphs for categorical variables and histograms for continuous variables. We formatted the graphs to be able to optimize for space on the pdf and still be able to see the visualization analysis for each variable.
 
 ```{r univariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
@@ -288,7 +288,8 @@ summary(car_data)
 
 From these visualizations and statistics, we found the general distributions of each individual covariate which is always good to know before modeling. As we move onto bivariate analysis, we want to see how these distributions change when including price values to plot against them.
 
-## Bivariate 
+### Bivariate 
+
 For bivariate analysis, we wanted to analyze each covariate vs \textbf{price} to see the relationship between each one. We want to be able to see first if a covariate could be used to distinguish price values for cars and see if there is a linear relationship between the predictor variable and our response variable. The following graphs show us \textbf{price} vs each individual covariate using box plots and scatter plots for categorical and continuous variables.
 
 ```{r bivariate predictor variables, echo=FALSE, message=FALSE, warning=FALSE}
@@ -501,6 +502,7 @@ knit_hooks$set(output = function(x, options) {
 ```
 
 ### AIC
+
 We want to choose the covariates for our model based on the lowest AIC value. In the block of code below, a model with the fourteen covariates is made. Then the model is tested with every possible combination of covariates and are ordered by AIC in ascending order. We selected the top 5 best models and recorded the covariates associated with them.
 
 ```{r best model AIC, echo=FALSE, message=FALSE, warning=FALSE, output.lines=1:12}
@@ -517,6 +519,7 @@ dredge(full.model, rank = "AICc")
 ```
 
 ### BIC
+
 As we mentioned above, we also wanted to evaluate based on BIC as a indicator of a good model. We repeated the same process by using the same model with all the covariates and doing a grid search using BIC which was ordered in ascending order. Similar to the AIC model, we took the 5 top models for BIC and recorded the variables associated with each model.
 
 ```{r best model BIC, echo=FALSE, message=FALSE, warning=FALSE, output.lines=1:12}
@@ -551,6 +554,7 @@ kable(vif(final.model), col.names = c('VIF'))
 ```
 
 ## Output of Final Model
+
 We created the final model Using the covariates we selected after evaluating AIC and BIC values of the model. The table below displays the coefficients for the final model. 
 
 ```{r anova table and model summary, echo=FALSE, message=FALSE, warning=FALSE}
@@ -561,6 +565,7 @@ tidy(final.model, conf.int = TRUE) %>%
 ```
 
 ## Assumptions
+
 There are some assumptions that should be checked when using a multivariable linear model. These following assumptions should be checked:
 
 * Linearity: Response variable has a linear relationship with predictor variables. There should be no pattern in the plots unless in the case for interaction terms.
@@ -643,7 +648,7 @@ n2 = ggplot(data = car_aug, aes(sample = .resid)) +
 n1+n2
 ```
 
-The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Since the histogram of the residual is not normal and the QQ Plot is not following the diagonal on the tails, therefore the normal condition is not met for the model.
+The normal condition is not met since the QQ Plot is not following a completely diagonal line. The tails of the QQ plot are not on the diagonal line. Also the histogram of the residual is not normal.
 
 ### Independence
 
@@ -678,6 +683,10 @@ Based on the table of the linear model above, the estimate intercept is telling 
 ## Limitations
 
 There are a few limitations of the model that should be acknowledged when trying to predict car price. To begin with, the model will not be able to accurately predict the price of a car that has covariate values outside the range of values that the model was trained on. For example, the final model was trained on the variable \textbf{carlength} which ranged from 140 to 200. Thus it would not be wise to predict the price of car with a \textbf{carlength} outside the range [140,200]. In other words, the model can interpolate but not extrapolate. Another limitation is that this model can only fit data linearly. Even though this dataset fits a linear model well, there might be non linear models that can predict \textbf{price} at a much higher accuracy. 
+
+## Conclusion
+
+Multiple linear regression appears to be a good approach to accurately predicting car price. It is interesting to see how logical the final predictor variables are. In future work we might try to run a non linear machine learning model to see how its results compare to our linear model. The pro of using linear regression is that the results are easily interpretable, but if we used a black box machine learning algorithm, it would most likely predict car prices at a higher accuracy.
 
 ## Additional Work
 
